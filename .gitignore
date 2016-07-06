@@ -30,3 +30,4 @@ sysinfo.txt
 *.unitypackage
 ProjectSettings/ProjectSettings.asset
 ProjectSettings/ProjectVersion.txt
+sh.exe.stackdump
