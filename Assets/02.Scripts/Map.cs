@@ -20,33 +20,32 @@ public class Map : MonoBehaviour
 	public float GenerationStepDelay;
 
 
-	private Room RoomInstance;
 	private List<Room> _rooms;
 
 	// Generate Rooms and Corridors
 	public IEnumerator Generate()
 	{
 		_rooms = new List<Room>();
-		
+
 		// Generate Rooms
 		for (int i = 0; i < RoomCount; i++)
 		{
-			RoomInstance = CreateRoom();
-			if (RoomInstance == null)
+			Room roomInstance = CreateRoom();
+			if (roomInstance == null)
 			{
 				RoomCount = _rooms.Count;
 				Debug.Log("Cannot make every rooms!");
 				Debug.Log("Created Rooms : " + RoomCount);
 				break;
 			}
-			StartCoroutine(RoomInstance.Generate());
+			StartCoroutine(roomInstance.Generate());
 			yield return null;
 
 			foreach (Room room in _rooms)
 			{
-				if (room != RoomInstance)
+				if (room != roomInstance)
 				{
-					RoomInstance.CheckAdjacent(room);
+					roomInstance.CheckAdjacent(room, RoomSize.Min + 2);
 				}
 			}
 		}
