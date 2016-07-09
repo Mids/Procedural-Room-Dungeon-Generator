@@ -25,9 +25,9 @@ public class Room : MonoBehaviour
 			for (int z = 0; z < Size.z; z++)
 			{
 				CreateTile(new IntVector2(x, z));
-				yield return null;
 			}
 		}
+		yield return null;
 	}
 
 	private Tile CreateTile(IntVector2 coordinates)

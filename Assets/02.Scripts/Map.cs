@@ -27,7 +27,8 @@ public class Map : MonoBehaviour
 	public IEnumerator Generate()
 	{
 		_rooms = new List<Room>();
-
+		
+		// Generate Rooms
 		for (int i = 0; i < RoomCount; i++)
 		{
 			RoomInstance = CreateRoom();
@@ -50,14 +51,16 @@ public class Map : MonoBehaviour
 			}
 		}
 
+		// Show Adjacent Rooms
 		foreach (Room room in _rooms)
 		{
 			foreach (Room adjacentRoom in room.AdjacentRooms)
 			{
-				Debug.DrawLine(room.transform.position, adjacentRoom.transform.position, Color.white, Single.MaxValue);
-				yield return null;
+				Debug.DrawLine(room.transform.position, adjacentRoom.transform.position, Color.white, 10);
 			}
+			yield return null;
 		}
+
 		// TODO: Corridor
 	}
 
