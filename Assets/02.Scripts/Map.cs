@@ -19,7 +19,7 @@ public class Map : MonoBehaviour
 	public MinMax RoomSize;
 	public float GenerationStepDelay;
 
-
+	private List<Triangle> _triangulation;
 	private List<Room> _rooms;
 
 	// Generate Rooms and Corridors
@@ -40,23 +40,15 @@ public class Map : MonoBehaviour
 			}
 			StartCoroutine(roomInstance.Generate());
 			yield return null;
-
-			foreach (Room room in _rooms)
-			{
-				if (room != roomInstance)
-				{
-					roomInstance.CheckAdjacent(room, RoomSize.Min + 2);
-				}
-			}
 		}
 
-		// Show Adjacent Rooms
-		foreach (Room room in _rooms)
+		yield return BowyerWatson();
+
+		Debug.Log("Every Rooms are connected");
+
+		foreach (Triangle triangle in _triangulation)
 		{
-			foreach (Room adjacentRoom in room.AdjacentRooms)
-			{
-				Debug.DrawLine(room.transform.position, adjacentRoom.transform.position, Color.white, 10);
-			}
+			triangle.Show();
 			yield return null;
 		}
 
@@ -76,7 +68,7 @@ public class Map : MonoBehaviour
 			{
 				newRoom = Instantiate(RoomPrefab);
 				_rooms.Add(newRoom);
-				newRoom.name = "Room " +_rooms.Count+" ("+ coordinates.x + ", " + coordinates.z + ")";
+				newRoom.name = "Room " + _rooms.Count + " (" + coordinates.x + ", " + coordinates.z + ")";
 				newRoom.Size = size;
 				newRoom.Coordinates = coordinates;
 				newRoom.transform.parent = transform;
@@ -119,5 +111,119 @@ public class Map : MonoBehaviour
 	{
 
 		return false;
+	}
+
+	// Big enough to cover the map
+	private Triangle LootTriangle
+	{
+		get
+		{
+			Vector3[] vertexs = new Vector3[] {
+			new Vector3(MapSize.x * 2, 0, MapSize.z),
+			new Vector3(-MapSize.x * 2, 0, MapSize.z),
+			new Vector3(0, 0, -2 * MapSize.z)};
+
+			Room[] tempRooms = new Room[3];
+			for (int i = 0; i < 3; i++)
+			{
+				tempRooms[i] = Instantiate(RoomPrefab);
+				tempRooms[i].transform.localPosition = vertexs[i];
+				tempRooms[i].name = "Loot Room " + i;
+			}
+
+			return new Triangle(tempRooms[0], tempRooms[1], tempRooms[2]);
+		}
+	}
+
+	private IEnumerator BowyerWatson()
+	{
+		_triangulation = new List<Triangle>();
+
+		Triangle loot = LootTriangle;
+		_triangulation.Add(loot);
+
+		foreach (Room room in _rooms)
+		{
+			List<Triangle> badTriangles = new List<Triangle>();
+
+			foreach (Triangle triangle in _triangulation)
+			{
+				if (triangle.IsContaining(room))
+				{
+					badTriangles.Add(triangle);
+				}
+			}
+
+			List<Corridor> polygon = new List<Corridor>();
+			foreach (Triangle badTriangle in badTriangles)
+			{
+				foreach (Corridor corridor in badTriangle.Corridors)
+				{
+					if (corridor.Triangles.Count == 1)
+					{
+						polygon.Add(corridor);
+						corridor.Triangles.Remove(badTriangle);
+						continue;
+					}
+
+					foreach (Triangle triangle in corridor.Triangles)
+					{
+						if (triangle == badTriangle)
+						{
+							continue;
+						}
+
+						// Delete Corridor which is between two bad triangles.
+						if (badTriangles.Contains(triangle))
+						{
+							corridor.Rooms[0].RoomCorridor.Remove(corridor.Rooms[1]);
+							corridor.Rooms[1].RoomCorridor.Remove(corridor.Rooms[0]);
+						}
+						else
+						{
+							polygon.Add(corridor);
+						}
+						break;
+					}
+				}
+			}
+
+			// Delete Bad Triangles
+			for (int index = badTriangles.Count - 1; index >= 0; --index)
+			{
+				Triangle triangle = badTriangles[index];
+				badTriangles.RemoveAt(index);
+				_triangulation.Remove(triangle);
+				foreach (Corridor corridor in triangle.Corridors)
+				{
+					corridor.Triangles.Remove(triangle);
+				}
+			}
+
+			foreach (Corridor corridor in polygon)
+			{
+				// TODO: Edge sync
+				Triangle newTriangle = new Triangle(corridor.Rooms[0], corridor.Rooms[1], room);
+				_triangulation.Add(newTriangle);
+			}
+
+			foreach (Triangle triangle in _triangulation)
+			{
+				triangle.Show();
+			}
+
+			yield return null;
+		}
+
+		for (int index = _triangulation.Count - 1; index >= 0; index--)
+		{
+			if (_triangulation[index].Rooms.Contains(loot.Rooms[0]) || _triangulation[index].Rooms.Contains(loot.Rooms[1]) ||
+				_triangulation[index].Rooms.Contains(loot.Rooms[2]))
+			{
+				_triangulation.RemoveAt(index);
+			}
+		}
+
+		yield return new WaitForSeconds(5f);
 	}
 }
