@@ -44,6 +44,7 @@ public class Map : MonoBehaviour
 		}
 
 		yield return BowyerWatson();
+		Debug.Log("Every Rooms are fully connected");
 
 		yield return PrimMST();
 		Debug.Log("Every Rooms are minimally connected");
@@ -250,7 +251,7 @@ public class Map : MonoBehaviour
 						}
 						continue;
 					}
-					
+
 					if (minLength.Value == null || minLength.Value.Length > pair.Value.Length)
 					{
 						minLength = pair;
@@ -267,7 +268,7 @@ public class Map : MonoBehaviour
 			}
 			connectedRooms.Add(minLength.Key);
 			_connectedCorridors.Add(minLength.Value);
-			
+
 			yield return null;
 		}
 	}
