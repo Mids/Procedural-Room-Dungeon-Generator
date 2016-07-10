@@ -21,6 +21,7 @@ public class Map : MonoBehaviour
 
 	private List<Triangle> _triangulation;
 	private List<Room> _rooms;
+	private List<Corridor> _connectedCorridors;
 
 	// Generate Rooms and Corridors
 	public IEnumerator Generate()
@@ -47,7 +48,7 @@ public class Map : MonoBehaviour
 		yield return PrimMST();
 		Debug.Log("Every Rooms are minimally connected");
 
-		foreach (Corridor corridor in connectedCorridors)
+		foreach (Corridor corridor in _connectedCorridors)
 		{
 			corridor.Show();
 		}
@@ -218,14 +219,17 @@ public class Map : MonoBehaviour
 				_triangulation.RemoveAt(index);
 			}
 		}
-	}
 
-	List<Corridor> connectedCorridors;
+		foreach (Room room in loot.Rooms)
+		{
+			Destroy(room.gameObject);
+		}
+	}
 
 	private IEnumerator PrimMST()
 	{
 		List<Room> connectedRooms = new List<Room>();
-		connectedCorridors = new List<Corridor>();
+		_connectedCorridors = new List<Corridor>();
 
 		connectedRooms.Add(_rooms[0]);
 
@@ -240,7 +244,7 @@ public class Map : MonoBehaviour
 				{
 					if (connectedRooms.Contains(pair.Key))
 					{
-						if (!connectedCorridors.Contains(pair.Value))
+						if (!_connectedCorridors.Contains(pair.Value))
 						{
 							deleteList.Add(pair.Value);
 						}
@@ -262,7 +266,8 @@ public class Map : MonoBehaviour
 				}
 			}
 			connectedRooms.Add(minLength.Key);
-			connectedCorridors.Add(minLength.Value);
+			_connectedCorridors.Add(minLength.Value);
+			
 			yield return null;
 		}
 	}
