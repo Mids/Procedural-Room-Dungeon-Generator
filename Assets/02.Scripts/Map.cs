@@ -44,12 +44,12 @@ public class Map : MonoBehaviour
 
 		yield return BowyerWatson();
 
-		Debug.Log("Every Rooms are connected");
+		yield return PrimMST();
+		Debug.Log("Every Rooms are minimally connected");
 
-		foreach (Triangle triangle in _triangulation)
+		foreach (Corridor corridor in connectedCorridors)
 		{
-			triangle.Show();
-			yield return null;
+			corridor.Show();
 		}
 
 		// TODO: Corridor
@@ -207,11 +207,6 @@ public class Map : MonoBehaviour
 				_triangulation.Add(newTriangle);
 			}
 
-			foreach (Triangle triangle in _triangulation)
-			{
-				triangle.Show();
-			}
-
 			yield return null;
 		}
 
@@ -223,7 +218,52 @@ public class Map : MonoBehaviour
 				_triangulation.RemoveAt(index);
 			}
 		}
+	}
 
-		yield return new WaitForSeconds(5f);
+	List<Corridor> connectedCorridors;
+
+	private IEnumerator PrimMST()
+	{
+		List<Room> connectedRooms = new List<Room>();
+		connectedCorridors = new List<Corridor>();
+
+		connectedRooms.Add(_rooms[0]);
+
+		while (connectedRooms.Count < _rooms.Count)
+		{
+			KeyValuePair<Room, Corridor> minLength = new KeyValuePair<Room, Corridor>();
+			List<Corridor> deleteList = new List<Corridor>();
+
+			foreach (Room room in connectedRooms)
+			{
+				foreach (KeyValuePair<Room, Corridor> pair in room.RoomCorridor)
+				{
+					if (connectedRooms.Contains(pair.Key))
+					{
+						if (!connectedCorridors.Contains(pair.Value))
+						{
+							deleteList.Add(pair.Value);
+						}
+						continue;
+					}
+					
+					if (minLength.Value == null || minLength.Value.Length > pair.Value.Length)
+					{
+						minLength = pair;
+					}
+				}
+
+				for (int index = deleteList.Count - 1; index >= 0; index--)
+				{
+					Corridor corridor = deleteList[index];
+					corridor.Rooms[0].RoomCorridor.Remove(corridor.Rooms[1]);
+					corridor.Rooms[1].RoomCorridor.Remove(corridor.Rooms[0]);
+					deleteList.RemoveAt(index);
+				}
+			}
+			connectedRooms.Add(minLength.Key);
+			connectedCorridors.Add(minLength.Value);
+			yield return null;
+		}
 	}
 }
