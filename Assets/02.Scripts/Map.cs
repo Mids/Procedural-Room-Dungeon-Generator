@@ -11,6 +11,14 @@ public struct MinMax
 	public int Max;
 }
 
+public enum TileType
+{
+	EMPTY,
+	ROOM,
+	CORRIDOR,
+	WALL
+}
+
 public class Map : MonoBehaviour
 {
 	public Room RoomPrefab;
@@ -19,13 +27,26 @@ public class Map : MonoBehaviour
 	public MinMax RoomSize;
 	public float GenerationStepDelay;
 
-	private List<Triangle> _triangulation;
 	private List<Room> _rooms;
-	private List<Corridor> _connectedCorridors;
+	private List<Corridor> _corridors;
+
+	private TileType[,] _tiles;
+
+	public void SetTileType(IntVector2 coordinates, TileType tileType)
+	{
+		_tiles[coordinates.x, coordinates.z] = tileType;
+	}
+
+	public TileType GetTileType(IntVector2 coordinates)
+	{
+		return _tiles[coordinates.x, coordinates.z];
+	}
+
 
 	// Generate Rooms and Corridors
 	public IEnumerator Generate()
 	{
+		_tiles = new TileType[MapSize.x, MapSize.z];
 		_rooms = new List<Room>();
 
 		// Generate Rooms
@@ -49,10 +70,19 @@ public class Map : MonoBehaviour
 		yield return PrimMST();
 		Debug.Log("Every Rooms are minimally connected");
 
-		foreach (Corridor corridor in _connectedCorridors)
+		foreach (Corridor corridor in _corridors)
 		{
 			corridor.Show();
 		}
+
+		// Generate Corridors
+		foreach (Corridor corridor in _corridors)
+		{
+			StartCoroutine(corridor.Generate());
+			yield return null;
+		}
+
+		Debug.Log(_corridors.Count + " corridors remained");
 
 		// TODO: Corridor
 	}
@@ -62,7 +92,7 @@ public class Map : MonoBehaviour
 		Room newRoom = null;
 
 		// Try as many as we can.
-		for (int i = 0; i < MapSize.x * MapSize.z; i++)
+		for (int i = 0; i < RoomCount * RoomCount; i++)
 		{
 			IntVector2 size = new IntVector2(Random.Range(RoomSize.Min, RoomSize.Max + 1), Random.Range(RoomSize.Min, RoomSize.Max + 1));
 			IntVector2 coordinates = new IntVector2(Random.Range(0, MapSize.x - size.x), Random.Range(0, MapSize.z - size.z));
@@ -70,11 +100,13 @@ public class Map : MonoBehaviour
 			{
 				newRoom = Instantiate(RoomPrefab);
 				_rooms.Add(newRoom);
-				newRoom.name = "Room " + _rooms.Count + " (" + coordinates.x + ", " + coordinates.z + ")";
+				newRoom.Num = _rooms.Count;
+				newRoom.name = "Room " + newRoom.Num + " (" + coordinates.x + ", " + coordinates.z + ")";
 				newRoom.Size = size;
 				newRoom.Coordinates = coordinates;
 				newRoom.transform.parent = transform;
 				newRoom.transform.localPosition = new Vector3(coordinates.x - MapSize.x * 0.5f + size.x * 0.5f, 0, coordinates.z - MapSize.z * 0.5f + size.z * 0.5f);
+				newRoom.Init(this);
 				break;
 			}
 		}
@@ -109,12 +141,6 @@ public class Map : MonoBehaviour
 		return false;
 	}
 
-	private bool IsAdjacent(Room room1, Room room2)
-	{
-
-		return false;
-	}
-
 	// Big enough to cover the map
 	private Triangle LootTriangle
 	{
@@ -131,6 +157,7 @@ public class Map : MonoBehaviour
 				tempRooms[i] = Instantiate(RoomPrefab);
 				tempRooms[i].transform.localPosition = vertexs[i];
 				tempRooms[i].name = "Loot Room " + i;
+				tempRooms[i].Init(this);
 			}
 
 			return new Triangle(tempRooms[0], tempRooms[1], tempRooms[2]);
@@ -139,16 +166,16 @@ public class Map : MonoBehaviour
 
 	private IEnumerator BowyerWatson()
 	{
-		_triangulation = new List<Triangle>();
+		List<Triangle> triangulation = new List<Triangle>();
 
 		Triangle loot = LootTriangle;
-		_triangulation.Add(loot);
+		triangulation.Add(loot);
 
 		foreach (Room room in _rooms)
 		{
 			List<Triangle> badTriangles = new List<Triangle>();
 
-			foreach (Triangle triangle in _triangulation)
+			foreach (Triangle triangle in triangulation)
 			{
 				if (triangle.IsContaining(room))
 				{
@@ -180,6 +207,7 @@ public class Map : MonoBehaviour
 						{
 							corridor.Rooms[0].RoomCorridor.Remove(corridor.Rooms[1]);
 							corridor.Rooms[1].RoomCorridor.Remove(corridor.Rooms[0]);
+							Destroy(corridor.gameObject);
 						}
 						else
 						{
@@ -195,7 +223,7 @@ public class Map : MonoBehaviour
 			{
 				Triangle triangle = badTriangles[index];
 				badTriangles.RemoveAt(index);
-				_triangulation.Remove(triangle);
+				triangulation.Remove(triangle);
 				foreach (Corridor corridor in triangle.Corridors)
 				{
 					corridor.Triangles.Remove(triangle);
@@ -206,23 +234,35 @@ public class Map : MonoBehaviour
 			{
 				// TODO: Edge sync
 				Triangle newTriangle = new Triangle(corridor.Rooms[0], corridor.Rooms[1], room);
-				_triangulation.Add(newTriangle);
+				triangulation.Add(newTriangle);
 			}
 
-			yield return null;
 		}
+		yield return null;
 
-		for (int index = _triangulation.Count - 1; index >= 0; index--)
+		for (int index = triangulation.Count - 1; index >= 0; index--)
 		{
-			if (_triangulation[index].Rooms.Contains(loot.Rooms[0]) || _triangulation[index].Rooms.Contains(loot.Rooms[1]) ||
-				_triangulation[index].Rooms.Contains(loot.Rooms[2]))
+			if (triangulation[index].Rooms.Contains(loot.Rooms[0]) || triangulation[index].Rooms.Contains(loot.Rooms[1]) ||
+				triangulation[index].Rooms.Contains(loot.Rooms[2]))
 			{
-				_triangulation.RemoveAt(index);
+				triangulation.RemoveAt(index);
 			}
 		}
 
 		foreach (Room room in loot.Rooms)
 		{
+			List<Corridor> deleteList = new List<Corridor>();
+			foreach (KeyValuePair<Room, Corridor> pair in room.RoomCorridor)
+			{
+				deleteList.Add(pair.Value);
+			}
+			for (int index = deleteList.Count - 1; index >= 0; index--)
+			{
+				Corridor corridor = deleteList[index];
+				corridor.Rooms[0].RoomCorridor.Remove(corridor.Rooms[1]);
+				corridor.Rooms[1].RoomCorridor.Remove(corridor.Rooms[0]);
+				Destroy(corridor.gameObject);
+			}
 			Destroy(room.gameObject);
 		}
 	}
@@ -230,7 +270,7 @@ public class Map : MonoBehaviour
 	private IEnumerator PrimMST()
 	{
 		List<Room> connectedRooms = new List<Room>();
-		_connectedCorridors = new List<Corridor>();
+		_corridors = new List<Corridor>();
 
 		connectedRooms.Add(_rooms[0]);
 
@@ -245,31 +285,39 @@ public class Map : MonoBehaviour
 				{
 					if (connectedRooms.Contains(pair.Key))
 					{
-						if (!_connectedCorridors.Contains(pair.Value))
-						{
-							deleteList.Add(pair.Value);
-						}
 						continue;
 					}
-
 					if (minLength.Value == null || minLength.Value.Length > pair.Value.Length)
 					{
 						minLength = pair;
 					}
 				}
+			}
 
-				for (int index = deleteList.Count - 1; index >= 0; index--)
+			// Check Unnecessary Corridors.
+			foreach (KeyValuePair<Room, Corridor> pair in minLength.Key.RoomCorridor)
+			{
+				if (connectedRooms.Contains(pair.Key) && (minLength.Value != pair.Value))
 				{
-					Corridor corridor = deleteList[index];
-					corridor.Rooms[0].RoomCorridor.Remove(corridor.Rooms[1]);
-					corridor.Rooms[1].RoomCorridor.Remove(corridor.Rooms[0]);
-					deleteList.RemoveAt(index);
+					deleteList.Add(pair.Value);
 				}
 			}
-			connectedRooms.Add(minLength.Key);
-			_connectedCorridors.Add(minLength.Value);
 
-			yield return null;
+			// Delete corridors
+			for (int index = deleteList.Count - 1; index >= 0; index--)
+			{
+				Corridor corridor = deleteList[index];
+				corridor.Rooms[0].RoomCorridor.Remove(corridor.Rooms[1]);
+				corridor.Rooms[1].RoomCorridor.Remove(corridor.Rooms[0]);
+				deleteList.RemoveAt(index);
+				Destroy(corridor.gameObject);
+			}
+
+			connectedRooms.Add(minLength.Key);
+			_corridors.Add(minLength.Value);
+			minLength.Value.Activated = true;
+
 		}
+		yield return null;
 	}
 }

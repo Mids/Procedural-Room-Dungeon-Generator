@@ -16,11 +16,11 @@ public class Triangle
 		Rooms.Add(r2);
 		Rooms.Add(r3);
 
-		Corridors.Add(Corridor.GetCorridor(r1, r2));
+		Corridors.Add(r1.CreateCorridor(r2));
 		Corridors[0].Triangles.Add(this);
-		Corridors.Add(Corridor.GetCorridor(r2, r3));
+		Corridors.Add(r2.CreateCorridor(r3));
 		Corridors[1].Triangles.Add(this);
-		Corridors.Add(Corridor.GetCorridor(r3, r1));
+		Corridors.Add(r3.CreateCorridor(r1));
 		Corridors[2].Triangles.Add(this);
 	}
 
