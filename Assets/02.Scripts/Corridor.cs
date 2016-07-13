@@ -7,8 +7,6 @@ public class Corridor : MonoBehaviour
 	private GameObject _tilesObject;
 	public Tile TilePrefab;
 
-	public bool Activated = false;
-
 	public Room[] Rooms = new Room[2];
 	public List<Triangle> Triangles = new List<Triangle>();
 
@@ -27,6 +25,9 @@ public class Corridor : MonoBehaviour
 		_tilesObject = new GameObject("Tiles");
 		_tilesObject.transform.parent = transform;
 		_tilesObject.transform.localPosition = Vector3.zero;
+
+		// Seperate Corridor to room
+		MoveStickedCorridor();
 
 		_tiles = new List<Tile>();
 		int start = Rooms[0].Coordinates.x + Rooms[0].Size.x / 2;
@@ -72,9 +73,9 @@ public class Corridor : MonoBehaviour
 
 	private Tile CreateTile(IntVector2 coordinates)
 	{
-		if (_map.GetTileType(coordinates) == TileType.EMPTY)
+		if (_map.GetTileType(coordinates) == TileType.Empty)
 		{
-			_map.SetTileType(coordinates, TileType.CORRIDOR);
+			_map.SetTileType(coordinates, TileType.Corridor);
 		}
 		else
 		{
@@ -86,5 +87,56 @@ public class Corridor : MonoBehaviour
 		newTile.transform.parent = _tilesObject.transform;
 		newTile.transform.localPosition = new Vector3(coordinates.x - Coordinates.x + 0.5f, 0, coordinates.z - Coordinates.z + 0.5f);
 		return newTile;
+	}
+
+	private void MoveStickedCorridor()
+	{
+		IntVector2 correction = new IntVector2(0,0);
+
+		if (Rooms[0].Coordinates.x == Coordinates.x + 1)
+		{
+			// left 2
+			correction.x = 2;
+		}
+		else if (Rooms[0].Coordinates.x + Rooms[0].Size.x == Coordinates.x)
+		{
+			// right 2
+			correction.x = -2;
+		}
+		else if (Rooms[0].Coordinates.x == Coordinates.x)
+		{
+			// left
+			correction.x = 1;
+		}
+		else if (Rooms[0].Coordinates.x + Rooms[0].Size.x == Coordinates.x + 1)
+		{
+			// right
+			correction.x = -1;
+		}
+
+
+		if (Rooms[1].Coordinates.z == Coordinates.z + 1)
+		{
+			// Bottom 2
+			correction.z = 2;
+		}
+		else if (Rooms[1].Coordinates.z + Rooms[1].Size.z == Coordinates.z)
+		{
+			// Top 2
+			correction.z = -2;
+		}
+		else if (Rooms[1].Coordinates.z == Coordinates.z)
+		{
+			// Bottom
+			correction.z = 1;
+		}
+		else if (Rooms[1].Coordinates.z + Rooms[1].Size.z == Coordinates.z + 1)
+		{
+			// Top
+			correction.z = -1;
+		}
+
+		Coordinates += correction;
+		transform.localPosition += correction;
 	}
 }

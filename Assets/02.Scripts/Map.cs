@@ -13,10 +13,10 @@ public struct MinMax
 
 public enum TileType
 {
-	EMPTY,
-	ROOM,
-	CORRIDOR,
-	WALL
+	Empty,
+	Room,
+	Corridor,
+	Wall
 }
 
 public class Map : MonoBehaviour
@@ -30,23 +30,23 @@ public class Map : MonoBehaviour
 	private List<Room> _rooms;
 	private List<Corridor> _corridors;
 
-	private TileType[,] _tiles;
+	private TileType[,] _tilesTypes;
 
 	public void SetTileType(IntVector2 coordinates, TileType tileType)
 	{
-		_tiles[coordinates.x, coordinates.z] = tileType;
+		_tilesTypes[coordinates.x, coordinates.z] = tileType;
 	}
 
 	public TileType GetTileType(IntVector2 coordinates)
 	{
-		return _tiles[coordinates.x, coordinates.z];
+		return _tilesTypes[coordinates.x, coordinates.z];
 	}
 
 
 	// Generate Rooms and Corridors
 	public IEnumerator Generate()
 	{
-		_tiles = new TileType[MapSize.x, MapSize.z];
+		_tilesTypes = new TileType[MapSize.x, MapSize.z];
 		_rooms = new List<Room>();
 
 		// Generate Rooms
@@ -84,7 +84,49 @@ public class Map : MonoBehaviour
 
 		Debug.Log(_corridors.Count + " corridors remained");
 
-		// TODO: Corridor
+		yield return WallCheck();
+	}
+
+	private IEnumerator WallCheck()
+	{
+		for (int x = 0; x < MapSize.x; x++)
+		{
+			for (int z = 0; z < MapSize.z; z++)
+			{
+				if (_tilesTypes[x, z] == TileType.Empty && IsWall(x, z))
+				{
+					_tilesTypes[x, z] = TileType.Wall;
+					Vector3 position = CoordinatesToPosition(new IntVector2(x, z));
+					Vector3 half = new Vector3(0.5f, 0, 0.5f);
+					Debug.DrawLine(position - half, position + half, Color.red, 4f);
+				}
+			}
+		}
+		yield return null;
+	}
+
+	private bool IsWall(int x, int z)
+	{
+		for (int i = x - 1; i <= x + 1; i++)
+		{
+			if (i < 0 || i >= MapSize.x)
+			{
+				continue;
+			}
+			for (int j = z - 1; j <= z + 1; j++)
+			{
+				if (j < 0 || j >= MapSize.z || (i == x && j == z))
+				{
+					continue;
+				}
+				if (_tilesTypes[i, j] == TileType.Room || _tilesTypes[i, j] == TileType.Corridor)
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	private Room CreateRoom()
@@ -95,7 +137,7 @@ public class Map : MonoBehaviour
 		for (int i = 0; i < RoomCount * RoomCount; i++)
 		{
 			IntVector2 size = new IntVector2(Random.Range(RoomSize.Min, RoomSize.Max + 1), Random.Range(RoomSize.Min, RoomSize.Max + 1));
-			IntVector2 coordinates = new IntVector2(Random.Range(0, MapSize.x - size.x), Random.Range(0, MapSize.z - size.z));
+			IntVector2 coordinates = new IntVector2(Random.Range(1, MapSize.x - size.x), Random.Range(1, MapSize.z - size.z));
 			if (!IsOverlapped(size, coordinates))
 			{
 				newRoom = Instantiate(RoomPrefab);
@@ -105,7 +147,9 @@ public class Map : MonoBehaviour
 				newRoom.Size = size;
 				newRoom.Coordinates = coordinates;
 				newRoom.transform.parent = transform;
-				newRoom.transform.localPosition = new Vector3(coordinates.x - MapSize.x * 0.5f + size.x * 0.5f, 0, coordinates.z - MapSize.z * 0.5f + size.z * 0.5f);
+				Vector3 position = CoordinatesToPosition(coordinates);
+				position.x += size.x * 0.5f - 0.5f; position.z += size.z * 0.5f - 0.5f;
+				newRoom.transform.localPosition = position;
 				newRoom.Init(this);
 				break;
 			}
@@ -132,8 +176,8 @@ public class Map : MonoBehaviour
 		foreach (Room room in _rooms)
 		{
 			// Give a little space between two rooms
-			if (Mathf.Abs(room.Coordinates.x - coordinates.x + (room.Size.x - size.x) * 0.5f) <= (room.Size.x + size.x) * 0.6f &&
-				Mathf.Abs(room.Coordinates.z - coordinates.z + (room.Size.z - size.z) * 0.5f) <= (room.Size.z + size.z) * 0.6f)
+			if (Mathf.Abs(room.Coordinates.x - coordinates.x + (room.Size.x - size.x) * 0.5f) < (room.Size.x + size.x) * 0.7f &&
+				Mathf.Abs(room.Coordinates.z - coordinates.z + (room.Size.z - size.z) * 0.5f) < (room.Size.z + size.z) * 0.7f)
 			{
 				return true;
 			}
@@ -315,9 +359,12 @@ public class Map : MonoBehaviour
 
 			connectedRooms.Add(minLength.Key);
 			_corridors.Add(minLength.Value);
-			minLength.Value.Activated = true;
-
 		}
 		yield return null;
+	}
+
+	public Vector3 CoordinatesToPosition(IntVector2 coordinates)
+	{
+		return new Vector3(coordinates.x - MapSize.x * 0.5f + 0.5f, 0f, coordinates.z - MapSize.z * 0.5f + 0.5f);
 	}
 }

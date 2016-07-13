@@ -41,9 +41,9 @@ public class Room : MonoBehaviour
 
 	private Tile CreateTile(IntVector2 coordinates)
 	{
-		if (_map.GetTileType(coordinates) == TileType.EMPTY)
+		if (_map.GetTileType(coordinates) == TileType.Empty)
 		{
-			_map.SetTileType(coordinates, TileType.ROOM);
+			_map.SetTileType(coordinates, TileType.Room);
 		}
 		else
 		{

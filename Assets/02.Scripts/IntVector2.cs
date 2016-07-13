@@ -1,4 +1,6 @@
 ﻿
+using UnityEngine;
+
 [System.Serializable]
 public struct IntVector2 {
 
@@ -18,6 +20,13 @@ public struct IntVector2 {
 	}
 
 	public static IntVector2 operator -(IntVector2 a, IntVector2 b)
+	{
+		a.x -= b.x;
+		a.z -= b.z;
+		return a;
+	}
+
+	public static Vector3 operator +(Vector3 a, IntVector2 b)
 	{
 		a.x -= b.x;
 		a.z -= b.z;
