@@ -85,6 +85,11 @@ public class Map : MonoBehaviour
 		Debug.Log(_corridors.Count + " corridors remained");
 
 		yield return WallCheck();
+
+		foreach (Room room in _rooms)
+		{
+			yield return room.CreateWalls();
+		}
 	}
 
 	private IEnumerator WallCheck()
@@ -98,7 +103,7 @@ public class Map : MonoBehaviour
 					_tilesTypes[x, z] = TileType.Wall;
 					Vector3 position = CoordinatesToPosition(new IntVector2(x, z));
 					Vector3 half = new Vector3(0.5f, 0, 0.5f);
-					Debug.DrawLine(position - half, position + half, Color.red, 4f);
+//					Debug.DrawLine(position - half, position + half, Color.red, 4f);
 				}
 			}
 		}

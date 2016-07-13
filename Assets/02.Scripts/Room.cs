@@ -10,8 +10,10 @@ public class Room : MonoBehaviour
 	public int Num;
 
 	private GameObject _tilesObject;
+	private GameObject _wallsObject;
 	public Tile TilePrefab;
 	private Tile[,] _tiles;
+	public GameObject WallPrefab;
 
 	public Dictionary<Room, Corridor> RoomCorridor = new Dictionary<Room, Corridor>();
 
@@ -78,5 +80,56 @@ public class Room : MonoBehaviour
 		RoomCorridor.Add(otherRoom, newCorridor);
 
 		return newCorridor;
+	}
+
+	public IEnumerator CreateWalls()
+	{
+		_wallsObject = new GameObject("Walls");
+		_wallsObject.transform.parent = transform;
+		_wallsObject.transform.localPosition = Vector3.zero;
+
+		IntVector2 leftBottom = new IntVector2(Coordinates.x - 1, Coordinates.z - 1);
+		IntVector2 rightTop = new IntVector2(Coordinates.x + Size.x, Coordinates.z + Size.z);
+		for (int x = leftBottom.x; x <= rightTop.x; x++)
+		{
+			for (int z = leftBottom.z; z <= rightTop.z; z++)
+			{
+				// If it's center or corner or not wall
+				if ((x != leftBottom.x && x != rightTop.x && z != leftBottom.z && z != rightTop.z) ||
+					((x == leftBottom.x || x == rightTop.x) && (z == leftBottom.z || z == rightTop.z)) ||
+					(_map.GetTileType(new IntVector2(x, z)) != TileType.Wall))
+				{
+					continue;
+				}
+				Quaternion rotation = Quaternion.identity;
+				if (x == leftBottom.x)
+				{
+					rotation = MapDirection.West.ToRotation();
+				}
+				else if (x == rightTop.x)
+				{
+					rotation = MapDirection.East.ToRotation();
+				}
+				else if (z == leftBottom.z)
+				{
+					rotation = MapDirection.South.ToRotation();
+				}
+				else if (z == rightTop.z)
+				{
+					rotation = MapDirection.North.ToRotation();
+				}
+				else
+				{
+					Debug.LogError("Wall is not on appropriate location!!");
+				}
+
+				GameObject newWall = Instantiate(WallPrefab);
+				newWall.name = "Wall (" + x + ", " + z + ")";
+				newWall.transform.parent = _wallsObject.transform;
+				newWall.transform.localPosition = new Vector3(x - Coordinates.x - Size.x * 0.5f + 0.5f, 0f, z - Coordinates.z - Size.z * 0.5f + 0.5f);
+				newWall.transform.localRotation = rotation;
+			}
+		}
+		yield return null;
 	}
 }
