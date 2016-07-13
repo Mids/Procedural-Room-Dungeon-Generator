@@ -13,6 +13,14 @@ public static class MapDirections
 {
 	public const int Count = 4;
 
+	public static readonly MapDirection[] Directions =
+	{
+		MapDirection.North,
+		MapDirection.East,
+		MapDirection.South,
+		MapDirection.West
+	};
+
 	private static readonly IntVector2[] Vectors =
 	{
 		new IntVector2(0, 1),

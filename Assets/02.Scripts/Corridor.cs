@@ -5,7 +5,9 @@ using System.Collections.Generic;
 public class Corridor : MonoBehaviour
 {
 	private GameObject _tilesObject;
+	private GameObject _wallsObject;
 	public Tile TilePrefab;
+	public GameObject WallPrefab;
 
 	public Room[] Rooms = new Room[2];
 	public List<Triangle> Triangles = new List<Triangle>();
@@ -91,7 +93,7 @@ public class Corridor : MonoBehaviour
 
 	private void MoveStickedCorridor()
 	{
-		IntVector2 correction = new IntVector2(0,0);
+		IntVector2 correction = new IntVector2(0, 0);
 
 		if (Rooms[0].Coordinates.x == Coordinates.x + 1)
 		{
@@ -138,5 +140,31 @@ public class Corridor : MonoBehaviour
 
 		Coordinates += correction;
 		transform.localPosition += correction;
+	}
+
+	public IEnumerator CreateWalls()
+	{
+		_wallsObject = new GameObject("Walls");
+		_wallsObject.transform.parent = transform;
+		_wallsObject.transform.localPosition = Vector3.zero;
+
+		foreach (Tile tile in _tiles)
+		{
+			foreach (MapDirection direction in MapDirections.Directions)
+			{
+				IntVector2 coordinates = tile.Coordinates + direction.ToIntVector2();
+				if (_map.GetTileType(coordinates) == TileType.Wall)
+				{
+					GameObject newWall = Instantiate(WallPrefab);
+					newWall.name = "Wall (" + coordinates.x + ", " + coordinates.z + ")";
+					newWall.transform.parent = _wallsObject.transform;
+					newWall.transform.localPosition = _map.CoordinatesToPosition(coordinates) - transform.localPosition;
+					newWall.transform.localRotation = direction.ToRotation();
+				}
+			}
+		}
+		yield return null;
+
+
 	}
 }

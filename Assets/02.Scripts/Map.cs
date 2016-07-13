@@ -56,24 +56,21 @@ public class Map : MonoBehaviour
 			if (roomInstance == null)
 			{
 				RoomCount = _rooms.Count;
-				Debug.Log("Cannot make every rooms!");
+				Debug.Log("Cannot make more rooms!");
 				Debug.Log("Created Rooms : " + RoomCount);
 				break;
 			}
 			StartCoroutine(roomInstance.Generate());
 			yield return null;
 		}
+		Debug.Log("Every rooms are generated");
 
+		// Delaunay Triangulation
 		yield return BowyerWatson();
-		Debug.Log("Every Rooms are fully connected");
 
+		// Minimal Spanning Tree
 		yield return PrimMST();
-		Debug.Log("Every Rooms are minimally connected");
-
-		foreach (Corridor corridor in _corridors)
-		{
-			corridor.Show();
-		}
+		Debug.Log("Every rooms are minimally connected");
 
 		// Generate Corridors
 		foreach (Corridor corridor in _corridors)
@@ -81,15 +78,19 @@ public class Map : MonoBehaviour
 			StartCoroutine(corridor.Generate());
 			yield return null;
 		}
+		Debug.Log("Every corridors are generated");
 
-		Debug.Log(_corridors.Count + " corridors remained");
-
+		// Generate Walls
 		yield return WallCheck();
-
 		foreach (Room room in _rooms)
 		{
 			yield return room.CreateWalls();
 		}
+		foreach (Corridor corridor in _corridors)
+		{
+			yield return corridor.CreateWalls();
+		}
+		Debug.Log("Every walls are generated");
 	}
 
 	private IEnumerator WallCheck()
@@ -101,9 +102,6 @@ public class Map : MonoBehaviour
 				if (_tilesTypes[x, z] == TileType.Empty && IsWall(x, z))
 				{
 					_tilesTypes[x, z] = TileType.Wall;
-					Vector3 position = CoordinatesToPosition(new IntVector2(x, z));
-					Vector3 half = new Vector3(0.5f, 0, 0.5f);
-//					Debug.DrawLine(position - half, position + half, Color.red, 4f);
 				}
 			}
 		}
