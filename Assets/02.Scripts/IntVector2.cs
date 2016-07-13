@@ -28,8 +28,8 @@ public struct IntVector2 {
 
 	public static Vector3 operator +(Vector3 a, IntVector2 b)
 	{
-		a.x -= b.x;
-		a.z -= b.z;
+		a.x += b.x;
+		a.z += b.z;
 		return a;
 	}
 }
