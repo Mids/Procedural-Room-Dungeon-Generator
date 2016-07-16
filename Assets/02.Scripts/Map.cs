@@ -23,6 +23,7 @@ public class Map : MonoBehaviour
 {
 	public Room RoomPrefab;
 	public int RoomCount;
+	public RoomSetting[] RoomSettings;
 	public IntVector2 MapSize;
 	public MinMax RoomSize;
 	public float GenerationStepDelay;
@@ -60,6 +61,7 @@ public class Map : MonoBehaviour
 				Debug.Log("Created Rooms : " + RoomCount);
 				break;
 			}
+			roomInstance.Setting = RoomSettings[Random.Range(0, RoomSettings.Length)];
 			StartCoroutine(roomInstance.Generate());
 			yield return null;
 		}

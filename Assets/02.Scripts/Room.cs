@@ -14,6 +14,7 @@ public class Room : MonoBehaviour
 	public Tile TilePrefab;
 	private Tile[,] _tiles;
 	public GameObject WallPrefab;
+	public RoomSetting Setting;
 
 	public Dictionary<Room, Corridor> RoomCorridor = new Dictionary<Room, Corridor>();
 
@@ -26,6 +27,7 @@ public class Room : MonoBehaviour
 
 	public IEnumerator Generate()
 	{
+		// Create parent object
 		_tilesObject = new GameObject("Tiles");
 		_tilesObject.transform.parent = transform;
 		_tilesObject.transform.localPosition = Vector3.zero;
@@ -56,6 +58,7 @@ public class Room : MonoBehaviour
 		newTile.name = "Tile " + coordinates.x + ", " + coordinates.z;
 		newTile.transform.parent = _tilesObject.transform;
 		newTile.transform.localPosition = new Vector3(coordinates.x - Coordinates.x - Size.x * 0.5f + 0.5f, 0f, coordinates.z - Coordinates.z - Size.z * 0.5f + 0.5f);
+		newTile.transform.GetChild(0).GetComponent<Renderer>().material = Setting.floor;
 		return newTile;
 	}
 
@@ -128,6 +131,7 @@ public class Room : MonoBehaviour
 				newWall.transform.parent = _wallsObject.transform;
 				newWall.transform.localPosition = new Vector3(x - Coordinates.x - Size.x * 0.5f + 0.5f, 0f, z - Coordinates.z - Size.z * 0.5f + 0.5f);
 				newWall.transform.localRotation = rotation;
+				newWall.transform.GetChild(0).GetComponent<Renderer>().material = Setting.wall;
 			}
 		}
 		yield return null;
