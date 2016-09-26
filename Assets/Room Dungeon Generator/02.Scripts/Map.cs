@@ -103,6 +103,9 @@ public class Map : MonoBehaviour
 			}
 			Debug.Log("Every walls are generated");
 		}
+
+		stopwatch.Stop();
+		print("Done in :" + stopwatch.ElapsedMilliseconds/1000f+"s");
 	}
 
 	private IEnumerator WallCheck()
