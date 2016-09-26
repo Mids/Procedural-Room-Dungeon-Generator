@@ -2,6 +2,8 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 
 [System.Serializable]
@@ -22,9 +24,12 @@ public enum TileType
 public class Map : MonoBehaviour
 {
 	public Room RoomPrefab;
+	[HideInInspector]
 	public int RoomCount;
 	public RoomSetting[] RoomSettings;
+	[HideInInspector]
 	public IntVector2 MapSize;
+	[HideInInspector]
 	public MinMax RoomSize;
 	public float GenerationStepDelay;
 
@@ -47,52 +52,57 @@ public class Map : MonoBehaviour
 	// Generate Rooms and Corridors
 	public IEnumerator Generate()
 	{
-		_tilesTypes = new TileType[MapSize.x, MapSize.z];
-		_rooms = new List<Room>();
+		Stopwatch stopwatch = new Stopwatch();
+		stopwatch.Start();
 
-		// Generate Rooms
-		for (int i = 0; i < RoomCount; i++)
 		{
-			Room roomInstance = CreateRoom();
-			if (roomInstance == null)
+			_tilesTypes = new TileType[MapSize.x, MapSize.z];
+			_rooms = new List<Room>();
+
+			// Generate Rooms
+			for (int i = 0; i < RoomCount; i++)
 			{
-				RoomCount = _rooms.Count;
-				Debug.Log("Cannot make more rooms!");
-				Debug.Log("Created Rooms : " + RoomCount);
-				break;
+				Room roomInstance = CreateRoom();
+				if (roomInstance == null)
+				{
+					RoomCount = _rooms.Count;
+					Debug.Log("Cannot make more rooms!");
+					Debug.Log("Created Rooms : " + RoomCount);
+					break;
+				}
+				roomInstance.Setting = RoomSettings[Random.Range(0, RoomSettings.Length)];
+				StartCoroutine(roomInstance.Generate());
+				yield return null;
 			}
-			roomInstance.Setting = RoomSettings[Random.Range(0, RoomSettings.Length)];
-			StartCoroutine(roomInstance.Generate());
-			yield return null;
-		}
-		Debug.Log("Every rooms are generated");
+			Debug.Log("Every rooms are generated");
 
-		// Delaunay Triangulation
-		yield return BowyerWatson();
+			// Delaunay Triangulation
+			yield return BowyerWatson();
 
-		// Minimal Spanning Tree
-		yield return PrimMST();
-		Debug.Log("Every rooms are minimally connected");
+			// Minimal Spanning Tree
+			yield return PrimMST();
+			Debug.Log("Every rooms are minimally connected");
 
-		// Generate Corridors
-		foreach (Corridor corridor in _corridors)
-		{
-			StartCoroutine(corridor.Generate());
-			yield return null;
-		}
-		Debug.Log("Every corridors are generated");
+			// Generate Corridors
+			foreach (Corridor corridor in _corridors)
+			{
+				StartCoroutine(corridor.Generate());
+				yield return null;
+			}
+			Debug.Log("Every corridors are generated");
 
-		// Generate Walls
-		yield return WallCheck();
-		foreach (Room room in _rooms)
-		{
-			yield return room.CreateWalls();
+			// Generate Walls
+			yield return WallCheck();
+			foreach (Room room in _rooms)
+			{
+				yield return room.CreateWalls();
+			}
+			foreach (Corridor corridor in _corridors)
+			{
+				yield return corridor.CreateWalls();
+			}
+			Debug.Log("Every walls are generated");
 		}
-		foreach (Corridor corridor in _corridors)
-		{
-			yield return corridor.CreateWalls();
-		}
-		Debug.Log("Every walls are generated");
 	}
 
 	private IEnumerator WallCheck()
