@@ -31,6 +31,8 @@ public class Map : MonoBehaviour
 	public IntVector2 MapSize;
 	[HideInInspector]
 	public MinMax RoomSize;
+	[HideInInspector]
+	public int CorridorWidth;
 	public float GenerationStepDelay;
 
 	private List<Room> _rooms;
@@ -86,6 +88,7 @@ public class Map : MonoBehaviour
 			// Generate Corridors
 			foreach (Corridor corridor in _corridors)
 			{
+				corridor.Width = CorridorWidth;
 				StartCoroutine(corridor.Generate());
 				yield return null;
 			}

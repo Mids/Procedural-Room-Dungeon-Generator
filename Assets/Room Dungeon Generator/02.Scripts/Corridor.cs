@@ -18,6 +18,8 @@ public class Corridor : MonoBehaviour
 	private Map _map;
 	private List<Tile> _tiles;
 
+	public int Width;
+
 	public void Init(Map map)
 	{
 		_map = map;
@@ -40,12 +42,15 @@ public class Corridor : MonoBehaviour
 			start = end;
 			end = temp;
 		}
-		for (int i = start; i <= end; i++)
+		for (int i = start; i < end + Width; i++)
 		{
-			Tile newTile = CreateTile(new IntVector2(i, Coordinates.z));
-			if (newTile)
+			for (int j = 0; j < Width; j++)
 			{
-				_tiles.Add(newTile);
+				Tile newTile = CreateTile(new IntVector2(i, Coordinates.z+j));
+				if (newTile)
+				{
+					_tiles.Add(newTile);
+				}
 			}
 		}
 		start = Rooms[1].Coordinates.z + Rooms[1].Size.z / 2;
@@ -56,12 +61,15 @@ public class Corridor : MonoBehaviour
 			start = end;
 			end = temp;
 		}
-		for (int i = start; i <= end; i++)
+		for (int i = start; i < end + Width; i++)
 		{
-			Tile newTile = CreateTile(new IntVector2(Coordinates.x, i));
-			if (newTile)
+			for (int j = 0; j < Width; j++)
 			{
-				_tiles.Add(newTile);
+				Tile newTile = CreateTile(new IntVector2(Coordinates.x+j, i));
+				if (newTile)
+				{
+					_tiles.Add(newTile);
+				}
 			}
 		}
 		yield return null;

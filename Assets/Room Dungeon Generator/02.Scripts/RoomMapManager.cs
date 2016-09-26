@@ -11,6 +11,7 @@ public class RoomMapManager : MonoBehaviour
 	public int MaxRooms;
 	public int MinRoomSize;
 	public int MaxRoomSize;
+	public int CorridorWidth;
 
 	void Start()
 	{
@@ -32,6 +33,7 @@ public class RoomMapManager : MonoBehaviour
 		mapInstance.MapSize = new IntVector2(MapSizeX, MapSizeZ);
 		mapInstance.RoomSize.Min = MinRoomSize;
 		mapInstance.RoomSize.Max = MaxRoomSize;
+		mapInstance.CorridorWidth = CorridorWidth;
 
 		StartCoroutine(mapInstance.Generate());
 	}
