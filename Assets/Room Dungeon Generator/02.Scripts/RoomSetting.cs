@@ -1,8 +1,12 @@
 ﻿using UnityEngine;
 using System;
+using ooparts.dungen;
 
-[Serializable]
-public class RoomSetting
+namespace ooparts.dungen
 {
-	public Material floor, wall;
+	[Serializable]
+	public class RoomSetting
+	{
+		public Material floor, wall;
+	}
 }

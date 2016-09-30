@@ -1,45 +1,49 @@
 ﻿using UnityEngine;
 using System.Collections;
+using ooparts.dungen;
 
-public class RoomMapManager : MonoBehaviour
+namespace ooparts.dungen
 {
-	public Map mapPrefap;
-	private Map mapInstance;
-
-	public int MapSizeX;
-	public int MapSizeZ;
-	public int MaxRooms;
-	public int MinRoomSize;
-	public int MaxRoomSize;
-
-	void Start()
+	public class RoomMapManager : MonoBehaviour
 	{
-		BeginGame();
-	}
+		public Map mapPrefap;
+		private Map mapInstance;
 
-	void Update()
-	{
-		if (Input.GetKeyDown(KeyCode.Space))
+		public int MapSizeX;
+		public int MapSizeZ;
+		public int MaxRooms;
+		public int MinRoomSize;
+		public int MaxRoomSize;
+
+		void Start()
 		{
-			RestartGame();
+			BeginGame();
 		}
-	}
 
-	private void BeginGame()
-	{
-		mapInstance = Instantiate(mapPrefap);
-		mapInstance.RoomCount = MaxRooms;
-		mapInstance.MapSize = new IntVector2(MapSizeX, MapSizeZ);
-		mapInstance.RoomSize.Min = MinRoomSize;
-		mapInstance.RoomSize.Max = MaxRoomSize;
+		void Update()
+		{
+			if (Input.GetKeyDown(KeyCode.Space))
+			{
+				RestartGame();
+			}
+		}
 
-		StartCoroutine(mapInstance.Generate());
-	}
+		private void BeginGame()
+		{
+			mapInstance = Instantiate(mapPrefap);
+			mapInstance.RoomCount = MaxRooms;
+			mapInstance.MapSize = new IntVector2(MapSizeX, MapSizeZ);
+			mapInstance.RoomSize.Min = MinRoomSize;
+			mapInstance.RoomSize.Max = MaxRoomSize;
 
-	private void RestartGame()
-	{
-		StopAllCoroutines();
-		Destroy(mapInstance.gameObject);
-		BeginGame();
+			StartCoroutine(mapInstance.Generate());
+		}
+
+		private void RestartGame()
+		{
+			StopAllCoroutines();
+			Destroy(mapInstance.gameObject);
+			BeginGame();
+		}
 	}
 }
