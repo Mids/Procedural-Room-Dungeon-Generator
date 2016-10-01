@@ -96,6 +96,7 @@ namespace ooparts.dungen
 				foreach (Room room in _rooms)
 				{
 					yield return room.CreateWalls();
+					yield return room.CreateMonsters();
 				}
 				foreach (Corridor corridor in _corridors)
 				{

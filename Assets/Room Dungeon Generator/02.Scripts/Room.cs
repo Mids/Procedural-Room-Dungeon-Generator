@@ -14,6 +14,7 @@ namespace ooparts.dungen
 
 		private GameObject _tilesObject;
 		private GameObject _wallsObject;
+		private GameObject _monstersObject;
 		public Tile TilePrefab;
 		private Tile[,] _tiles;
 		public GameObject WallPrefab;
@@ -22,6 +23,10 @@ namespace ooparts.dungen
 		public Dictionary<Room, Corridor> RoomCorridor = new Dictionary<Room, Corridor>();
 
 		private Map _map;
+
+		public GameObject MonsterPrefab;
+		public int MonsterCount;
+		private GameObject[] Monsters;
 
 		public void Init(Map map)
 		{
@@ -136,6 +141,25 @@ namespace ooparts.dungen
 					newWall.transform.localRotation = rotation;
 					newWall.transform.GetChild(0).GetComponent<Renderer>().material = Setting.wall;
 				}
+			}
+			yield return null;
+		}
+
+		public IEnumerator CreateMonsters()
+		{
+			_monstersObject = new GameObject("Monsters");
+			_monstersObject.transform.parent = transform;
+			_monstersObject.transform.localPosition = Vector3.zero;
+
+			Monsters = new GameObject[MonsterCount];
+
+			for (int i = 0; i < MonsterCount; i++)
+			{
+				GameObject newMonster = Instantiate(MonsterPrefab);
+				newMonster.name = "Monster " + (i + 1);
+				newMonster.transform.parent = _monstersObject.transform;
+				newMonster.transform.localPosition = new Vector3(i / 2f, 0f, i % 2f);
+				Monsters[i] = newMonster;
 			}
 			yield return null;
 		}
