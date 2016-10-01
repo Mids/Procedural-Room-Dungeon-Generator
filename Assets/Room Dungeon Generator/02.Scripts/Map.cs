@@ -38,6 +38,8 @@ namespace ooparts.dungen
 
 		private TileType[,] _tilesTypes;
 
+		private bool _hasPlayer = false;
+
 		public void SetTileType(IntVector2 coordinates, TileType tileType)
 		{
 			_tilesTypes[coordinates.x, coordinates.z] = tileType;
@@ -72,6 +74,15 @@ namespace ooparts.dungen
 					}
 					roomInstance.Setting = RoomSettings[Random.Range(0, RoomSettings.Length)];
 					StartCoroutine(roomInstance.Generate());
+
+					// Generate Player or Monster
+					if (_hasPlayer)
+						yield return roomInstance.CreateMonsters();
+					else
+					{
+						yield return roomInstance.CreatePlayer();
+						_hasPlayer = true;
+					}
 					yield return null;
 				}
 				Debug.Log("Every rooms are generated");
@@ -96,7 +107,6 @@ namespace ooparts.dungen
 				foreach (Room room in _rooms)
 				{
 					yield return room.CreateWalls();
-					yield return room.CreateMonsters();
 				}
 				foreach (Corridor corridor in _corridors)
 				{

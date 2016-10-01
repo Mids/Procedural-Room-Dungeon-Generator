@@ -52,6 +52,7 @@ MonoBehaviour:
   Setting:
     floor: {fileID: 0}
     wall: {fileID: 0}
+  PlayerPrefab: {fileID: 107172, guid: 10c14d2e748dab942a46f8401efd4ae1, type: 2}
   MonsterPrefab: {fileID: 154156, guid: acde751c4c58d3b499304eeb64a637c5, type: 2}
   MonsterCount: 5
 --- !u!1001 &100100000
@@ -87,6 +88,10 @@ Prefab:
       propertyPath: MonsterCount
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: PlayerPrefab
+      value: 
+      objectReference: {fileID: 107172, guid: 10c14d2e748dab942a46f8401efd4ae1, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 118404}

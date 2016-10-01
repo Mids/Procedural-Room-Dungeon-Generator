@@ -24,6 +24,8 @@ namespace ooparts.dungen
 
 		private Map _map;
 
+		public GameObject PlayerPrefab;
+
 		public GameObject MonsterPrefab;
 		public int MonsterCount;
 		private GameObject[] Monsters;
@@ -161,6 +163,15 @@ namespace ooparts.dungen
 				newMonster.transform.localPosition = new Vector3(i / 2f, 0f, i % 2f);
 				Monsters[i] = newMonster;
 			}
+			yield return null;
+		}
+
+		public IEnumerator CreatePlayer()
+		{
+			GameObject player = Instantiate((PlayerPrefab));
+			player.name = "Player";
+			player.transform.parent = transform.parent;
+			player.transform.localPosition = transform.localPosition;
 			yield return null;
 		}
 	}
