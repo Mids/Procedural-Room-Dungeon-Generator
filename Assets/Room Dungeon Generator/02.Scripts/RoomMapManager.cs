@@ -15,8 +15,12 @@ namespace ooparts.dungen
 		public int MinRoomSize;
 		public int MaxRoomSize;
 
+		public int TileSizeFactor = 1;
+		public static int TileSize;
+
 		void Start()
 		{
+			TileSize = TileSizeFactor;
 			BeginGame();
 		}
 
@@ -35,6 +39,7 @@ namespace ooparts.dungen
 			mapInstance.MapSize = new IntVector2(MapSizeX, MapSizeZ);
 			mapInstance.RoomSize.Min = MinRoomSize;
 			mapInstance.RoomSize.Max = MaxRoomSize;
+			TileSize = TileSizeFactor;
 
 			StartCoroutine(mapInstance.Generate());
 		}

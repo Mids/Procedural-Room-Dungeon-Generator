@@ -179,6 +179,7 @@ namespace ooparts.dungen
 					Vector3 position = CoordinatesToPosition(coordinates);
 					position.x += size.x * 0.5f - 0.5f;
 					position.z += size.z * 0.5f - 0.5f;
+					position *= RoomMapManager.TileSize;
 					newRoom.transform.localPosition = position;
 					newRoom.Init(this);
 					break;
@@ -219,9 +220,9 @@ namespace ooparts.dungen
 			{
 				Vector3[] vertexs = new Vector3[]
 				{
-					new Vector3(MapSize.x * 2, 0, MapSize.z),
-					new Vector3(-MapSize.x * 2, 0, MapSize.z),
-					new Vector3(0, 0, -2 * MapSize.z)
+					RoomMapManager.TileSize * new Vector3(MapSize.x * 2, 0, MapSize.z),
+					RoomMapManager.TileSize * new Vector3(-MapSize.x * 2, 0, MapSize.z),
+					RoomMapManager.TileSize * new Vector3(0, 0, -2 * MapSize.z)
 				};
 
 				Room[] tempRooms = new Room[3];

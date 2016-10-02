@@ -28,6 +28,7 @@ namespace ooparts.dungen
 
 		public IEnumerator Generate()
 		{
+			transform.localPosition *= RoomMapManager.TileSize;
 			_tilesObject = new GameObject("Tiles");
 			_tilesObject.transform.parent = transform;
 			_tilesObject.transform.localPosition = Vector3.zero;
@@ -91,7 +92,7 @@ namespace ooparts.dungen
 			newTile.Coordinates = coordinates;
 			newTile.name = "Tile " + coordinates.x + ", " + coordinates.z;
 			newTile.transform.parent = _tilesObject.transform;
-			newTile.transform.localPosition = new Vector3(coordinates.x - Coordinates.x + 0.5f, 0, coordinates.z - Coordinates.z + 0.5f);
+			newTile.transform.localPosition = RoomMapManager.TileSize * new Vector3(coordinates.x - Coordinates.x + 0.5f, 0, coordinates.z - Coordinates.z + 0.5f);
 			return newTile;
 		}
 
@@ -143,7 +144,7 @@ namespace ooparts.dungen
 			}
 
 			Coordinates += correction;
-			transform.localPosition += correction;
+			transform.localPosition += RoomMapManager.TileSize * new Vector3(correction.x, 0f, correction.z);
 		}
 
 		public IEnumerator CreateWalls()
@@ -162,8 +163,9 @@ namespace ooparts.dungen
 						GameObject newWall = Instantiate(WallPrefab);
 						newWall.name = "Wall (" + coordinates.x + ", " + coordinates.z + ")";
 						newWall.transform.parent = _wallsObject.transform;
-						newWall.transform.localPosition = _map.CoordinatesToPosition(coordinates) - transform.localPosition;
+						newWall.transform.localPosition = RoomMapManager.TileSize * _map.CoordinatesToPosition(coordinates) - transform.localPosition;
 						newWall.transform.localRotation = direction.ToRotation();
+						newWall.transform.localScale *= RoomMapManager.TileSize;
 					}
 				}
 			}
