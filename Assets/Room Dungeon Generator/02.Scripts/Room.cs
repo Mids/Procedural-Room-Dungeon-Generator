@@ -87,7 +87,7 @@ namespace ooparts.dungen
 			newCorridor.transform.localPosition = new Vector3(newCorridor.Coordinates.x - _map.MapSize.x / 2, 0, newCorridor.Coordinates.z - _map.MapSize.z / 2);
 			newCorridor.Rooms[0] = otherRoom;
 			newCorridor.Rooms[1] = this;
-			newCorridor.Length = Vector3.Distance(otherRoom.transform.localPosition, transform.localPosition);
+			newCorridor.Length = Mathf.Abs(otherRoom.transform.localPosition.x - transform.localPosition.x) + Mathf.Abs(otherRoom.transform.localPosition.z - transform.localPosition.z);
 			newCorridor.Init(_map);
 			otherRoom.RoomCorridor.Add(this, newCorridor);
 			RoomCorridor.Add(otherRoom, newCorridor);
