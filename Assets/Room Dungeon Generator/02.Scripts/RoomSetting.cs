@@ -1,6 +1,5 @@
-﻿using UnityEngine;
-using System;
-using ooparts.dungen;
+﻿using System;
+using UnityEngine;
 
 namespace ooparts.dungen
 {

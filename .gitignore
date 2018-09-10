@@ -32,3 +32,4 @@ ProjectSettings/ProjectSettings.asset
 ProjectSettings/ProjectVersion.txt
 sh.exe.stackdump
 Assets/AutoSave*
+.vs/

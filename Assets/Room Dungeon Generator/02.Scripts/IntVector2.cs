@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace ooparts.dungen
 {
-	[System.Serializable]
+	[Serializable]
 	public struct IntVector2
 	{
 		public int x, z;

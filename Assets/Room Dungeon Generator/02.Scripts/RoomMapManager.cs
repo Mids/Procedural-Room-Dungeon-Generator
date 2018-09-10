@@ -1,35 +1,30 @@
 ﻿using UnityEngine;
-using System.Collections;
-using ooparts.dungen;
 
 namespace ooparts.dungen
 {
 	public class RoomMapManager : MonoBehaviour
 	{
-		public Map mapPrefap;
+		public static int TileSize;
 		private Map mapInstance;
+		public Map mapPrefap;
 
 		public int MapSizeX;
 		public int MapSizeZ;
 		public int MaxRooms;
-		public int MinRoomSize;
 		public int MaxRoomSize;
+		public int MinRoomSize;
 
 		public int TileSizeFactor = 1;
-		public static int TileSize;
 
-		void Start()
+		private void Start()
 		{
 			TileSize = TileSizeFactor;
 			BeginGame();
 		}
 
-		void Update()
+		private void Update()
 		{
-			if (Input.GetKeyDown(KeyCode.Space))
-			{
-				RestartGame();
-			}
+			if (Input.GetKeyDown(KeyCode.Space)) RestartGame();
 		}
 
 		private void BeginGame()

@@ -1,17 +1,15 @@
 ﻿using System;
-using UnityEngine;
 using System.Collections.Generic;
-using ooparts.dungen;
+using UnityEngine;
 
 namespace ooparts.dungen
 {
 	public class Triangle
 	{
-		public List<Room> Rooms = new List<Room>();
-		public List<Corridor> Corridors = new List<Corridor>();
-
 		private Vector3 _circumcenter = Vector3.zero;
 		private float _radius;
+		public List<Corridor> Corridors = new List<Corridor>();
+		public List<Room> Rooms = new List<Room>();
 
 		public Triangle(Room r1, Room r2, Room r3)
 		{
@@ -28,7 +26,7 @@ namespace ooparts.dungen
 		}
 
 		/// <summary>
-		/// Is in circumcircle
+		///     Is in circumcircle
 		/// </summary>
 		/// <param name="room"> The point that be checked </param>
 		/// <returns> True if the point is in this triangle's circumcircle </returns>
@@ -37,20 +35,17 @@ namespace ooparts.dungen
 			// Save calculated circumcenter.
 			if (_circumcenter == Vector3.zero)
 			{
-				Vector3[] vertexs = new Vector3[3];
-				for (int index = 0; index < Rooms.Count; index++)
-				{
-					vertexs[index] = Rooms[index].transform.localPosition;
-				}
+				var vertexs = new Vector3[3];
+				for (var index = 0; index < Rooms.Count; index++) vertexs[index] = Rooms[index].transform.localPosition;
 
-				float a = vertexs[1].x - vertexs[0].x;
-				float b = vertexs[1].z - vertexs[0].z;
-				float c = vertexs[2].x - vertexs[0].x;
-				float d = vertexs[2].z - vertexs[0].z;
+				var a = vertexs[1].x - vertexs[0].x;
+				var b = vertexs[1].z - vertexs[0].z;
+				var c = vertexs[2].x - vertexs[0].x;
+				var d = vertexs[2].z - vertexs[0].z;
 
-				float aux1 = a * (vertexs[0].x + vertexs[1].x) + b * (vertexs[0].z + vertexs[1].z);
-				float aux2 = c * (vertexs[0].x + vertexs[2].x) + d * (vertexs[0].z + vertexs[2].z);
-				float div = 2.0f * (a * (vertexs[2].z - vertexs[1].z) - b * (vertexs[2].x - vertexs[1].x));
+				var aux1 = a * (vertexs[0].x + vertexs[1].x) + b * (vertexs[0].z + vertexs[1].z);
+				var aux2 = c * (vertexs[0].x + vertexs[2].x) + d * (vertexs[0].z + vertexs[2].z);
+				var div = 2.0f * (a * (vertexs[2].z - vertexs[1].z) - b * (vertexs[2].x - vertexs[1].x));
 
 				if (Math.Abs(div) < float.Epsilon)
 				{
@@ -62,20 +57,14 @@ namespace ooparts.dungen
 				_radius = Mathf.Sqrt((_circumcenter.x - vertexs[0].x) * (_circumcenter.x - vertexs[0].x) + (_circumcenter.z - vertexs[0].z) * (_circumcenter.z - vertexs[0].z));
 			}
 
-			if (Vector3.Distance(room.transform.localPosition, _circumcenter) > _radius)
-			{
-				return false;
-			}
+			if (Vector3.Distance(room.transform.localPosition, _circumcenter) > _radius) return false;
 
 			return true;
 		}
 
 		public void Show()
 		{
-			foreach (Corridor corridor in Corridors)
-			{
-				corridor.Show();
-			}
+			foreach (var corridor in Corridors) corridor.Show();
 		}
 	}
 }

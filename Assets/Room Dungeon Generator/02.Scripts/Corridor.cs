@@ -1,25 +1,22 @@
 ﻿using System.Collections;
-using UnityEngine;
 using System.Collections.Generic;
-using ooparts.dungen;
+using UnityEngine;
 
 namespace ooparts.dungen
 {
 	public class Corridor : MonoBehaviour
 	{
-		private GameObject _tilesObject;
-		private GameObject _wallsObject;
-		public Tile TilePrefab;
-		public GameObject WallPrefab;
-
-		public Room[] Rooms = new Room[2];
-		public List<Triangle> Triangles = new List<Triangle>();
-
-		public float Length;
-		public IntVector2 Coordinates; // Rooms[1].x , Rooms[0].z
-
 		private Map _map;
 		private List<Tile> _tiles;
+		private GameObject _tilesObject;
+		private GameObject _wallsObject;
+
+		public IntVector2 Coordinates; // Rooms[1].x , Rooms[0].z
+		public float Length;
+		public Room[] Rooms = new Room[2];
+		public Tile TilePrefab;
+		public List<Triangle> Triangles = new List<Triangle>();
+		public GameObject WallPrefab;
 
 		public void Init(Map map)
 		{
@@ -33,42 +30,40 @@ namespace ooparts.dungen
 			_tilesObject.transform.parent = transform;
 			_tilesObject.transform.localPosition = Vector3.zero;
 
-			// Seperate Corridor to room
+			// Separate Corridor to room
 			MoveStickedCorridor();
 
 			_tiles = new List<Tile>();
-			int start = Rooms[0].Coordinates.x + Rooms[0].Size.x / 2;
-			int end = Coordinates.x;
+			var start = Rooms[0].Coordinates.x + Rooms[0].Size.x / 2;
+			var end = Coordinates.x;
 			if (start > end)
 			{
-				int temp = start;
+				var temp = start;
 				start = end;
 				end = temp;
 			}
-			for (int i = start; i <= end; i++)
+
+			for (var i = start; i <= end; i++)
 			{
-				Tile newTile = CreateTile(new IntVector2(i, Coordinates.z));
-				if (newTile)
-				{
-					_tiles.Add(newTile);
-				}
+				var newTile = CreateTile(new IntVector2(i, Coordinates.z));
+				if (newTile) _tiles.Add(newTile);
 			}
+
 			start = Rooms[1].Coordinates.z + Rooms[1].Size.z / 2;
 			end = Coordinates.z;
 			if (start > end)
 			{
-				int temp = start;
+				var temp = start;
 				start = end;
 				end = temp;
 			}
-			for (int i = start; i <= end; i++)
+
+			for (var i = start; i <= end; i++)
 			{
-				Tile newTile = CreateTile(new IntVector2(Coordinates.x, i));
-				if (newTile)
-				{
-					_tiles.Add(newTile);
-				}
+				var newTile = CreateTile(new IntVector2(Coordinates.x, i));
+				if (newTile) _tiles.Add(newTile);
 			}
+
 			yield return null;
 		}
 
@@ -81,14 +76,11 @@ namespace ooparts.dungen
 		private Tile CreateTile(IntVector2 coordinates)
 		{
 			if (_map.GetTileType(coordinates) == TileType.Empty)
-			{
 				_map.SetTileType(coordinates, TileType.Corridor);
-			}
 			else
-			{
 				return null;
-			}
-			Tile newTile = Instantiate(TilePrefab);
+
+			var newTile = Instantiate(TilePrefab);
 			newTile.Coordinates = coordinates;
 			newTile.name = "Tile " + coordinates.x + ", " + coordinates.z;
 			newTile.transform.parent = _tilesObject.transform;
@@ -98,50 +90,24 @@ namespace ooparts.dungen
 
 		private void MoveStickedCorridor()
 		{
-			IntVector2 correction = new IntVector2(0, 0);
+			var correction = new IntVector2(0, 0);
 
 			if (Rooms[0].Coordinates.x == Coordinates.x + 1)
-			{
-				// left 2
 				correction.x = 2;
-			}
 			else if (Rooms[0].Coordinates.x + Rooms[0].Size.x == Coordinates.x)
-			{
-				// right 2
 				correction.x = -2;
-			}
 			else if (Rooms[0].Coordinates.x == Coordinates.x)
-			{
-				// left
 				correction.x = 1;
-			}
-			else if (Rooms[0].Coordinates.x + Rooms[0].Size.x == Coordinates.x + 1)
-			{
-				// right
-				correction.x = -1;
-			}
+			else if (Rooms[0].Coordinates.x + Rooms[0].Size.x == Coordinates.x + 1) correction.x = -1;
 
 
 			if (Rooms[1].Coordinates.z == Coordinates.z + 1)
-			{
-				// Bottom 2
 				correction.z = 2;
-			}
 			else if (Rooms[1].Coordinates.z + Rooms[1].Size.z == Coordinates.z)
-			{
-				// Top 2
 				correction.z = -2;
-			}
 			else if (Rooms[1].Coordinates.z == Coordinates.z)
-			{
-				// Bottom
 				correction.z = 1;
-			}
-			else if (Rooms[1].Coordinates.z + Rooms[1].Size.z == Coordinates.z + 1)
-			{
-				// Top
-				correction.z = -1;
-			}
+			else if (Rooms[1].Coordinates.z + Rooms[1].Size.z == Coordinates.z + 1) correction.z = -1;
 
 			Coordinates += correction;
 			transform.localPosition += RoomMapManager.TileSize * new Vector3(correction.x, 0f, correction.z);
@@ -153,22 +119,21 @@ namespace ooparts.dungen
 			_wallsObject.transform.parent = transform;
 			_wallsObject.transform.localPosition = Vector3.zero;
 
-			foreach (Tile tile in _tiles)
+			foreach (var tile in _tiles)
+			foreach (var direction in MapDirections.Directions)
 			{
-				foreach (MapDirection direction in MapDirections.Directions)
+				var coordinates = tile.Coordinates + direction.ToIntVector2();
+				if (_map.GetTileType(coordinates) == TileType.Wall)
 				{
-					IntVector2 coordinates = tile.Coordinates + direction.ToIntVector2();
-					if (_map.GetTileType(coordinates) == TileType.Wall)
-					{
-						GameObject newWall = Instantiate(WallPrefab);
-						newWall.name = "Wall (" + coordinates.x + ", " + coordinates.z + ")";
-						newWall.transform.parent = _wallsObject.transform;
-						newWall.transform.localPosition = RoomMapManager.TileSize * _map.CoordinatesToPosition(coordinates) - transform.localPosition;
-						newWall.transform.localRotation = direction.ToRotation();
-						newWall.transform.localScale *= RoomMapManager.TileSize;
-					}
+					var newWall = Instantiate(WallPrefab);
+					newWall.name = "Wall (" + coordinates.x + ", " + coordinates.z + ")";
+					newWall.transform.parent = _wallsObject.transform;
+					newWall.transform.localPosition = RoomMapManager.TileSize * _map.CoordinatesToPosition(coordinates) - transform.localPosition;
+					newWall.transform.localRotation = direction.ToRotation();
+					newWall.transform.localScale *= RoomMapManager.TileSize;
 				}
 			}
+
 			yield return null;
 		}
 	}
