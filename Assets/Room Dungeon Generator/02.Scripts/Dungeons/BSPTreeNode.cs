@@ -12,5 +12,10 @@ namespace ooparts.dungen.Dungeons
 		public BSPTreeNode LNode;
 		public BSPTreeNode RNode;
 		public Room room; // TODO: need to check
+
+		public BSPTreeNode(IntVector2 size)
+		{
+			PartitionSize = size;
+		}
 	}
 }

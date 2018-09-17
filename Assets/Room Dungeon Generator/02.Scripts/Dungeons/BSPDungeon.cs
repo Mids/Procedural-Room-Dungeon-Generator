@@ -29,9 +29,26 @@ namespace ooparts.dungen.Dungeons
 			yield return null;
 		}
 
+		// March until connected to room or corridor
 		public IEnumerator ConnectRoomsWithCorridors()
 		{
 			yield return null;
+		}
+
+		// Put root node to split
+		// Succeeded - Split them recursively and return 1
+		// Failed - Generate Room and return 0
+		public IEnumerator SplitPartition(BSPTreeNode node)
+		{
+			yield return null;
+		}
+
+		// Generate Tree node if it is available.
+		public BSPTreeNode GenerateNode(IntVector2 size)
+		{
+			if (size > MinRoomSize)
+				return new BSPTreeNode(size);
+			return null;
 		}
 	}
 }
