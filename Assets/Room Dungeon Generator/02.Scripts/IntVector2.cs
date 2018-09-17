@@ -34,5 +34,22 @@ namespace ooparts.dungen
 			a.z += b.z;
 			return a;
 		}
+
+		public static bool operator >(IntVector2 a, IntVector2 b)
+		{
+			if (a.x > b.x && a.z > b.z)
+			{
+				return true;
+			}
+			return false;
+		}
+		public static bool operator <(IntVector2 a, IntVector2 b)
+		{
+			if (a.x < b.x && a.z < b.z)
+			{
+				return true;
+			}
+			return false;
+		}
 	}
 }
