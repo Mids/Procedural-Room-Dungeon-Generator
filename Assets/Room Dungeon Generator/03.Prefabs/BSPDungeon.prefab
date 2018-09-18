@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4099934010412204}
   - component: {fileID: 114654860230801546}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: BSPDungeon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -52,5 +52,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MapSize:
-    x: 0
-    z: 0
+    x: 100
+    z: 100
+  MinRoomSize:
+    x: 9
+    z: 9

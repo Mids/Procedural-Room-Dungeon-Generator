@@ -8,6 +8,8 @@ namespace ooparts.dungen
 	{
 		public int x, z;
 
+		public static IntVector2 Zero = new IntVector2(0, 0);
+
 		public IntVector2(int x, int z)
 		{
 			this.x = x;
@@ -41,15 +43,42 @@ namespace ooparts.dungen
 			{
 				return true;
 			}
+
 			return false;
 		}
+
 		public static bool operator <(IntVector2 a, IntVector2 b)
 		{
 			if (a.x < b.x && a.z < b.z)
 			{
 				return true;
 			}
+
 			return false;
+		}
+
+		public static IntVector2 operator +(IntVector2 a, int b)
+		{
+			IntVector2 result;
+			result.x = a.x + b;
+			result.z = a.z + b;
+			return result;
+		}
+
+		public static IntVector2 operator -(IntVector2 a, int b)
+		{
+			IntVector2 result;
+			result.x = a.x - b;
+			result.z = a.z - b;
+			return result;
+		}
+
+		public static IntVector2 operator *(IntVector2 a, int b)
+		{
+			IntVector2 result;
+			result.x = a.x * b;
+			result.z = a.z * b;
+			return result;
 		}
 	}
 }
