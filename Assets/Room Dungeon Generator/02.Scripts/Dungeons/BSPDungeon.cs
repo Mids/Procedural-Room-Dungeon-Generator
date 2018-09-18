@@ -33,9 +33,8 @@ namespace ooparts.dungen.Dungeons
 		}
 
 		// Generate Room for the Partition
-		public IEnumerator GenerateRooms()
+		public void GenerateRoom(IntVector2 size, IntVector2 coordinates)
 		{
-			yield return null;
 		}
 
 		// March until connected to room or corridor
@@ -49,7 +48,28 @@ namespace ooparts.dungen.Dungeons
 		// Failed - Generate Room and return false
 		public bool SplitPartition(BSPTreeNode node)
 		{
-			if (node.PartitionSize.x > node.PartitionSize.z && node.PartitionSize.x > _minPartitionSize.x * 2)
+			// The partition cannot be split.
+			if (node.PartitionSize < _minPartitionSize * 2)
+			{
+				// Generate Random Room here.
+				var roomSize = node.PartitionSize - 2;
+				roomSize.x = Random.Range(MinRoomSize.x, roomSize.x);
+				roomSize.z = Random.Range(MinRoomSize.z, roomSize.z);
+
+				var minRoomCoordinates = node.Coordinates + 1;
+				var maxRoomCoordinates = node.Coordinates + node.PartitionSize - roomSize - 1;
+				var roomCoordinates = new IntVector2(
+					Random.Range(minRoomCoordinates.x, maxRoomCoordinates.x),
+					Random.Range(minRoomCoordinates.z, maxRoomCoordinates.z)
+				);
+
+				GenerateRoom(roomSize, roomCoordinates);
+
+				return false;
+			}
+
+			// Can be split
+			if (node.PartitionSize.x > node.PartitionSize.z)
 			{
 				// Split X
 				var gap = node.PartitionSize.x - _minPartitionSize.x * 2;
@@ -67,11 +87,8 @@ namespace ooparts.dungen.Dungeons
 				var RNodeCoordinates = new IntVector2(node.Coordinates.x + LNodeSize.x, node.Coordinates.z);
 				node.RNode = GenerateNode(RNodeSize, RNodeCoordinates);
 				Assert.IsNotNull(node.RNode, "RNode is not generated");
-
-				return true;
 			}
-
-			if (node.PartitionSize.z > _minPartitionSize.z * 2)
+			else
 			{
 				// Split Z
 				var gap = node.PartitionSize.z - (MinRoomSize.z * 2 + 4);
@@ -89,13 +106,12 @@ namespace ooparts.dungen.Dungeons
 				var RNodeCoordinates = new IntVector2(node.Coordinates.x, node.Coordinates.z + LNodeSize.z);
 				node.RNode = GenerateNode(RNodeSize, RNodeCoordinates);
 				Assert.IsNotNull(node.RNode, "RNode is not generated");
-
-				return true;
 			}
 
-			// Generate Room if the partition cannot be split.
-
-			return false;
+			// Split child nodes
+			SplitPartition(node.LNode);
+			SplitPartition(node.RNode);
+			return true;
 		}
 
 		// Generate Tree node if it is available.
