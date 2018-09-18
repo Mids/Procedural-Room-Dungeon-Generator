@@ -1,10 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using ooparts.dungen;
-using UnityEngine;
-
-
-namespace ooparts.dungen.Dungeons
+﻿namespace ooparts.dungen.Dungeons
 {
 	public class BSPTreeNode
 	{

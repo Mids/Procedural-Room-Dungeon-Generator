@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -53,40 +52,41 @@ namespace ooparts.dungen.Dungeons
 			if (node.PartitionSize.x > node.PartitionSize.z && node.PartitionSize.x > _minPartitionSize.x * 2)
 			{
 				// Split X
-				int gap = node.PartitionSize.x - (_minPartitionSize.x * 2);
+				var gap = node.PartitionSize.x - _minPartitionSize.x * 2;
 				Assert.IsTrue(gap > 0, "Gap must be positive");
-				int rInt = Random.Range(0, gap);
+				var rInt = Random.Range(0, gap);
 
 				// LNode
-				IntVector2 LNodeSize = new IntVector2(_minPartitionSize.x + rInt, node.PartitionSize.z);
-				IntVector2 LNodeCoordinates = node.Coordinates;
+				var LNodeSize = new IntVector2(_minPartitionSize.x + rInt, node.PartitionSize.z);
+				var LNodeCoordinates = node.Coordinates;
 				node.LNode = GenerateNode(LNodeSize, LNodeCoordinates);
 				Assert.IsNotNull(node.LNode, "LNode is not generated");
 
 				// RNode
-				IntVector2 RNodeSize = new IntVector2(_minPartitionSize.x + gap - rInt, node.PartitionSize.z);
-				IntVector2 RNodeCoordinates = new IntVector2(node.Coordinates.x + LNodeSize.x, node.Coordinates.z);
+				var RNodeSize = new IntVector2(_minPartitionSize.x + gap - rInt, node.PartitionSize.z);
+				var RNodeCoordinates = new IntVector2(node.Coordinates.x + LNodeSize.x, node.Coordinates.z);
 				node.RNode = GenerateNode(RNodeSize, RNodeCoordinates);
 				Assert.IsNotNull(node.RNode, "RNode is not generated");
 
 				return true;
 			}
-			else if (node.PartitionSize.z > _minPartitionSize.z * 2)
+
+			if (node.PartitionSize.z > _minPartitionSize.z * 2)
 			{
 				// Split Z
-				int gap = node.PartitionSize.z - (MinRoomSize.z * 2 + 4);
+				var gap = node.PartitionSize.z - (MinRoomSize.z * 2 + 4);
 				Assert.IsTrue(gap > 0, "Gap must be positive");
-				int rInt = Random.Range(0, gap);
+				var rInt = Random.Range(0, gap);
 
 				// LNode
-				IntVector2 LNodeSize = new IntVector2(_minPartitionSize.x, node.PartitionSize.z + rInt);
-				IntVector2 LNodeCoordinates = node.Coordinates;
+				var LNodeSize = new IntVector2(_minPartitionSize.x, node.PartitionSize.z + rInt);
+				var LNodeCoordinates = node.Coordinates;
 				node.LNode = GenerateNode(LNodeSize, LNodeCoordinates);
 				Assert.IsNotNull(node.LNode, "LNode is not generated");
 
 				// RNode
-				IntVector2 RNodeSize = new IntVector2(_minPartitionSize.x, node.PartitionSize.z + gap - rInt);
-				IntVector2 RNodeCoordinates = new IntVector2(node.Coordinates.x, node.Coordinates.z + LNodeSize.z);
+				var RNodeSize = new IntVector2(_minPartitionSize.x, node.PartitionSize.z + gap - rInt);
+				var RNodeCoordinates = new IntVector2(node.Coordinates.x, node.Coordinates.z + LNodeSize.z);
 				node.RNode = GenerateNode(RNodeSize, RNodeCoordinates);
 				Assert.IsNotNull(node.RNode, "RNode is not generated");
 
