@@ -10,6 +10,7 @@ public class DungeonGenerator : MonoBehaviour
 	// Use this for initialization
 	void Start()
 	{
+		Instantiate(Dungeons[0]);
 	}
 
 	// Update is called once per frame

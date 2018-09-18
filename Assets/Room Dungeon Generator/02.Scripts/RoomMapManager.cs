@@ -4,7 +4,7 @@ namespace ooparts.dungen
 {
 	public class RoomMapManager : MonoBehaviour
 	{
-		public static int TileSize;
+		public static int TileSize = 1;
 		private Map mapInstance;
 		public Map mapPrefap;
 
