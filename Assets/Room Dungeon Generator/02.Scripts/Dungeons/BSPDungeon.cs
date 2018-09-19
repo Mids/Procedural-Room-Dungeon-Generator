@@ -19,7 +19,7 @@ namespace ooparts.dungen.Dungeons
 			// Partition Size is 1 tile larger than room size for padding
 			_rootNode = GenerateNode(MapSize + 2 * Padding, IntVector2.Zero - Padding);
 			_minPartitionSize = MinRoomSize + 2 * Padding;
-			SplitPartition(_rootNode);
+			StartCoroutine(SplitPartition(_rootNode));
 		}
 
 		// Generate whole dungeon
@@ -51,7 +51,7 @@ namespace ooparts.dungen.Dungeons
 		// Put root node to split
 		// Succeeded - Split them recursively and return true
 		// Failed - Generate Room and return false
-		public void SplitPartition(BSPTreeNode node)
+		public IEnumerator SplitPartition(BSPTreeNode node)
 		{
 			// The partition cannot be split.
 			if (node.PartitionSize < _minPartitionSize * 2)
@@ -80,12 +80,11 @@ namespace ooparts.dungen.Dungeons
 				Debug.DrawLine(rightTop, rightBot, Color.red, 3);
 				Debug.DrawLine(rightBot, leftBot, Color.red, 3);
 
-				return;
+				yield return null;
 			}
-
-			// Can be split
-			if (node.PartitionSize.x > node.PartitionSize.z || node.PartitionSize.z < _minPartitionSize.z * 2)
+			else if (node.PartitionSize.x > node.PartitionSize.z || node.PartitionSize.z < _minPartitionSize.z * 2)
 			{
+				// Can be split
 				// Split X
 				var gap = node.PartitionSize.x - _minPartitionSize.x * 2;
 				Assert.IsFalse(gap < 0, "Gap must be positive");
@@ -103,6 +102,10 @@ namespace ooparts.dungen.Dungeons
 				node.RNode = GenerateNode(RNodeSize, RNodeCoordinates);
 
 				Assert.IsNotNull(node.RNode, "RNode is not generated");
+
+				// Split child nodes
+				yield return SplitPartition(node.LNode);
+				yield return SplitPartition(node.RNode);
 			}
 			else
 			{
@@ -123,11 +126,11 @@ namespace ooparts.dungen.Dungeons
 				var RNodeCoordinates = new IntVector2(node.Coordinates.x, node.Coordinates.z + LNodeSize.z);
 				node.RNode = GenerateNode(RNodeSize, RNodeCoordinates);
 				Assert.IsNotNull(node.RNode, "RNode is not generated");
-			}
 
-			// Split child nodes
-			SplitPartition(node.LNode);
-			SplitPartition(node.RNode);
+				// Split child nodes
+				yield return SplitPartition(node.LNode);
+				yield return SplitPartition(node.RNode);
+			}
 		}
 
 		// Generate Tree node if it is available.
