@@ -9,6 +9,7 @@ namespace ooparts.dungen.Dungeons
 		public IntVector2 MapSize;
 		public IntVector2 MinRoomSize;
 		public BSPRoom RoomPrefab;
+		public int Padding = 1;
 
 		private IntVector2 _minPartitionSize;
 		private BSPTreeNode _rootNode;
@@ -16,8 +17,8 @@ namespace ooparts.dungen.Dungeons
 		private void Start()
 		{
 			// Partition Size is 1 tile larger than room size for padding
-			_rootNode = GenerateNode(MapSize + 2, IntVector2.Zero - 1);
-			_minPartitionSize = MinRoomSize + 2;
+			_rootNode = GenerateNode(MapSize + 2 * Padding, IntVector2.Zero - Padding);
+			_minPartitionSize = MinRoomSize + 2 * Padding;
 			SplitPartition(_rootNode);
 		}
 
@@ -56,12 +57,12 @@ namespace ooparts.dungen.Dungeons
 			if (node.PartitionSize < _minPartitionSize * 2)
 			{
 				// Generate Random Room here.
-				var roomSize = node.PartitionSize - 2;
+				var roomSize = node.PartitionSize - 2 * Padding;
 				roomSize.x = Random.Range(MinRoomSize.x, roomSize.x);
 				roomSize.z = Random.Range(MinRoomSize.z, roomSize.z);
 
-				var minRoomCoordinates = node.Coordinates + 1;
-				var maxRoomCoordinates = node.Coordinates + node.PartitionSize - roomSize - 1;
+				var minRoomCoordinates = node.Coordinates + Padding;
+				var maxRoomCoordinates = node.Coordinates + node.PartitionSize - roomSize - Padding;
 				var roomCoordinates = new IntVector2(
 					Random.Range(minRoomCoordinates.x, maxRoomCoordinates.x),
 					Random.Range(minRoomCoordinates.z, maxRoomCoordinates.z)
@@ -108,7 +109,7 @@ namespace ooparts.dungen.Dungeons
 				Assert.IsNotNull(node.LNode, "LNode is not generated");
 
 				// RNode
-				var RNodeSize = new IntVector2(node.PartitionSize.z, _minPartitionSize.z + gap - rInt);
+				var RNodeSize = new IntVector2(node.PartitionSize.x, _minPartitionSize.z + gap - rInt);
 				var RNodeCoordinates = new IntVector2(node.Coordinates.x, node.Coordinates.z + LNodeSize.z);
 				node.RNode = GenerateNode(RNodeSize, RNodeCoordinates);
 				Assert.IsNotNull(node.RNode, "RNode is not generated");
