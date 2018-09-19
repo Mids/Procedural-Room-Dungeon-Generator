@@ -46,7 +46,7 @@ public class BSPRoom : MonoBehaviour
 		newTile.Coordinates = coordinates;
 		newTile.name = "Tile " + coordinates.x + ", " + coordinates.z;
 		newTile.transform.parent = _tilesObject.transform;
-		newTile.transform.localPosition = RoomMapManager.TileSize * new Vector3(coordinates.x - _coordinates.x - _size.x * 0.5f + 0.5f, 0f, coordinates.z - _coordinates.z - _size.z * 0.5f + 0.5f);
+		newTile.transform.localPosition = RoomMapManager.TileSize * new Vector3(coordinates.x - _coordinates.x, 0f, coordinates.z - _coordinates.z);
 		newTile.transform.GetChild(0).GetComponent<Renderer>().material = Setting.floor;
 		return newTile;
 	}

@@ -70,5 +70,10 @@ namespace ooparts.dungen
 			result.z = a.z * b;
 			return result;
 		}
+
+		public Vector3 GetVector3()
+		{
+			return new Vector3(x, 0, z);
+		}
 	}
 }

@@ -70,6 +70,16 @@ namespace ooparts.dungen.Dungeons
 
 				GenerateRoom(roomSize, roomCoordinates);
 
+				// For Debug
+				Vector3 leftBot = node.Coordinates.GetVector3();
+				Vector3 rightTop = (node.Coordinates + node.PartitionSize).GetVector3();
+				Vector3 leftTop = new Vector3(leftBot.x, 0, rightTop.z);
+				Vector3 rightBot = new Vector3(rightTop.x, 0, leftBot.z);
+				Debug.DrawLine(leftBot, leftTop, Color.red, 3);
+				Debug.DrawLine(leftTop, rightTop, Color.red, 3);
+				Debug.DrawLine(rightTop, rightBot, Color.red, 3);
+				Debug.DrawLine(rightBot, leftBot, Color.red, 3);
+
 				return;
 			}
 
