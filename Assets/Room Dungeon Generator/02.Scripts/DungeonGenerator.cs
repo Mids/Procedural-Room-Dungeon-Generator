@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class DungeonGenerator : MonoBehaviour
 {
-	public Dungeon[] Dungeons;
+	public TileDungeon2D[] TileDungeon2Ds;
 
 	// Use this for initialization
 	void Start()
 	{
-		Instantiate(Dungeons[0]);
+		Instantiate(TileDungeon2Ds[0]);
 	}
 
 	// Update is called once per frame

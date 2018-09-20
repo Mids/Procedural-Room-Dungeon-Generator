@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using ooparts.dungen.Dungeons;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
@@ -15,15 +16,7 @@ namespace ooparts.dungen
 		public int Max;
 	}
 
-	public enum TileType
-	{
-		Empty,
-		Room,
-		Corridor,
-		Wall
-	}
-
-	public class Map : MonoBehaviour
+	public class Map : TileDungeon2D
 	{
 		private List<Corridor> _corridors;
 
@@ -31,9 +24,7 @@ namespace ooparts.dungen
 
 		private List<Room> _rooms;
 
-		private TileType[,] _tilesTypes;
 		public float GenerationStepDelay;
-		[HideInInspector] public IntVector2 MapSize;
 		[HideInInspector] public int RoomCount;
 		public Room RoomPrefab;
 		public RoomSetting[] RoomSettings;
@@ -69,17 +60,6 @@ namespace ooparts.dungen
 			}
 		}
 
-		public void SetTileType(IntVector2 coordinates, TileType tileType)
-		{
-			_tilesTypes[coordinates.x, coordinates.z] = tileType;
-		}
-
-		public TileType GetTileType(IntVector2 coordinates)
-		{
-			return _tilesTypes[coordinates.x, coordinates.z];
-		}
-
-
 		// Generate Rooms and Corridors
 		public IEnumerator Generate()
 		{
@@ -87,7 +67,6 @@ namespace ooparts.dungen
 			stopwatch.Start();
 
 			{
-				_tilesTypes = new TileType[MapSize.x, MapSize.z];
 				_rooms = new List<Room>();
 
 				// Generate Rooms
@@ -154,8 +133,8 @@ namespace ooparts.dungen
 		{
 			for (var x = 0; x < MapSize.x; x++)
 			for (var z = 0; z < MapSize.z; z++)
-				if (_tilesTypes[x, z] == TileType.Empty && IsWall(x, z))
-					_tilesTypes[x, z] = TileType.Wall;
+				if (GetTileType(x, z) == TileType.Empty && IsWall(x, z))
+					SetTileType(x, z, TileType.Wall);
 
 			yield return null;
 		}
@@ -170,7 +149,7 @@ namespace ooparts.dungen
 				{
 					if (j < 0 || j >= MapSize.z || i == x && j == z) continue;
 
-					if (_tilesTypes[i, j] == TileType.Room || _tilesTypes[i, j] == TileType.Corridor) return true;
+					if (GetTileType(i, j) == TileType.Room || GetTileType(i, j) == TileType.Corridor) return true;
 				}
 			}
 

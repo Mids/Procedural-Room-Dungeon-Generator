@@ -71,6 +71,14 @@ namespace ooparts.dungen
 			return result;
 		}
 
+		public static IntVector2 operator /(IntVector2 a, int b)
+		{
+			IntVector2 result;
+			result.x = a.x / b;
+			result.z = a.z / b;
+			return result;
+		}
+
 		public Vector3 GetVector3()
 		{
 			return new Vector3(x, 0, z);

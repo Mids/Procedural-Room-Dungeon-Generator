@@ -4,9 +4,8 @@ using UnityEngine.Assertions;
 
 namespace ooparts.dungen.Dungeons
 {
-	public class BSPDungeon : Dungeon
+	public class BSPDungeon : TileDungeon2D
 	{
-		public IntVector2 MapSize;
 		public IntVector2 MinRoomSize;
 		public BSPRoom RoomPrefab;
 		public int Padding = 1;
@@ -22,18 +21,6 @@ namespace ooparts.dungen.Dungeons
 			StartCoroutine(SplitPartition(_rootNode));
 		}
 
-		// Generate whole dungeon
-		public IEnumerator Generate()
-		{
-			yield return null;
-		}
-
-		// Generate Tree from root node
-		public IEnumerator GenerateTree()
-		{
-			yield return null;
-		}
-
 		// Generate Room for the Partition
 		public void GenerateRoom(IntVector2 size, IntVector2 coordinates)
 		{
@@ -42,15 +29,31 @@ namespace ooparts.dungen.Dungeons
 			room.Generate();
 		}
 
-		// March until connected to room or corridor
-		public IEnumerator ConnectRoomsWithCorridors()
+		// Generate Corridor between two coordinates
+		public void GenerateCorridor(IntVector2 left, IntVector2 right)
 		{
+
+		}
+
+		// March until connected to room or corridor
+		public IEnumerator ConnectRooms(BSPTreeNode node)
+		{
+			// Connect only if there are children
+			if (node.LNode != null && node.RNode != null)
+			{
+				// Connect children first
+				yield return ConnectRooms(node.LNode);
+				yield return ConnectRooms(node.RNode);
+
+				// 
+				var LCenter = node.LNode.Coordinates + (node.LNode.PartitionSize / 2);
+				var RCenter = node.RNode.Coordinates + (node.RNode.PartitionSize / 2);
+			}
 			yield return null;
 		}
 
 		// Put root node to split
-		// Succeeded - Split them recursively and return true
-		// Failed - Generate Room and return false
+		// Split them recursively or Generate Room
 		public IEnumerator SplitPartition(BSPTreeNode node)
 		{
 			// The partition cannot be split.

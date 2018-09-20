@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using ooparts.dungen.Dungeons;
 using UnityEngine;
 
 namespace ooparts.dungen
