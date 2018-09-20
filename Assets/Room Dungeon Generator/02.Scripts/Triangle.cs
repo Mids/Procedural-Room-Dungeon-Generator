@@ -6,10 +6,11 @@ namespace ooparts.dungen
 {
 	public class Triangle
 	{
+		public List<Room> Rooms = new List<Room>();
+		public List<Corridor> Corridors = new List<Corridor>();
+
 		private Vector3 _circumcenter = Vector3.zero;
 		private float _radius;
-		public List<Corridor> Corridors = new List<Corridor>();
-		public List<Room> Rooms = new List<Room>();
 
 		public Triangle(Room r1, Room r2, Room r3)
 		{

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ooparts.dungen.Dungeons
 {
@@ -14,18 +12,18 @@ namespace ooparts.dungen.Dungeons
 
 	public abstract class TileDungeon2D : MonoBehaviour
 	{
-
 		public IntVector2 MapSize;
+
 		private TileType[,] _tileTypes;
 
 		// Use this for initialization
-		void Start()
+		private void Start()
 		{
 			_tileTypes = new TileType[MapSize.x, MapSize.z];
 		}
 
 		// Update is called once per frame
-		void Update()
+		private void Update()
 		{
 		}
 
@@ -43,10 +41,10 @@ namespace ooparts.dungen.Dungeons
 		{
 			return GetTileType(coordinates.x, coordinates.z);
 		}
+
 		public TileType GetTileType(int x, int z)
 		{
 			return _tileTypes[x, z];
 		}
-
 	}
 }

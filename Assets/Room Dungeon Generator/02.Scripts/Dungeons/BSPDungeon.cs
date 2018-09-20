@@ -6,12 +6,11 @@ namespace ooparts.dungen.Dungeons
 {
 	public class BSPDungeon : TileDungeon2D
 	{
-		public IntVector2 MinRoomSize;
-		public BSPRoom RoomPrefab;
-		public int Padding = 1;
-
 		private IntVector2 _minPartitionSize;
 		private BSPTreeNode _rootNode;
+		public IntVector2 MinRoomSize;
+		public int Padding = 1;
+		public BSPRoom RoomPrefab;
 
 		private void Start()
 		{
@@ -32,7 +31,6 @@ namespace ooparts.dungen.Dungeons
 		// Generate Corridor between two coordinates
 		public void GenerateCorridor(IntVector2 left, IntVector2 right)
 		{
-
 		}
 
 		// March until connected to room or corridor
@@ -46,9 +44,10 @@ namespace ooparts.dungen.Dungeons
 				yield return ConnectRooms(node.RNode);
 
 				// 
-				var LCenter = node.LNode.Coordinates + (node.LNode.PartitionSize / 2);
-				var RCenter = node.RNode.Coordinates + (node.RNode.PartitionSize / 2);
+				var LCenter = node.LNode.Coordinates + node.LNode.PartitionSize / 2;
+				var RCenter = node.RNode.Coordinates + node.RNode.PartitionSize / 2;
 			}
+
 			yield return null;
 		}
 
@@ -74,10 +73,10 @@ namespace ooparts.dungen.Dungeons
 				GenerateRoom(roomSize, roomCoordinates);
 
 				// For Debug
-				Vector3 leftBot = node.Coordinates.GetVector3();
-				Vector3 rightTop = (node.Coordinates + node.PartitionSize).GetVector3();
-				Vector3 leftTop = new Vector3(leftBot.x, 0, rightTop.z);
-				Vector3 rightBot = new Vector3(rightTop.x, 0, leftBot.z);
+				var leftBot = node.Coordinates.GetVector3();
+				var rightTop = (node.Coordinates + node.PartitionSize).GetVector3();
+				var leftTop = new Vector3(leftBot.x, 0, rightTop.z);
+				var rightBot = new Vector3(rightTop.x, 0, leftBot.z);
 				Debug.DrawLine(leftBot, leftTop, Color.red, 3);
 				Debug.DrawLine(leftTop, rightTop, Color.red, 3);
 				Debug.DrawLine(rightTop, rightBot, Color.red, 3);

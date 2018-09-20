@@ -7,17 +7,17 @@ namespace ooparts.dungen
 {
 	public class Corridor : MonoBehaviour
 	{
-		private Map _map;
-		private List<Tile> _tiles;
-		private GameObject _tilesObject;
-		private GameObject _wallsObject;
-
 		public IntVector2 Coordinates; // Rooms[1].x , Rooms[0].z
 		public float Length;
 		public Room[] Rooms = new Room[2];
 		public Tile TilePrefab;
 		public List<Triangle> Triangles = new List<Triangle>();
 		public GameObject WallPrefab;
+
+		private Map _map;
+		private List<Tile> _tiles;
+		private GameObject _tilesObject;
+		private GameObject _wallsObject;
 
 		public void Init(Map map)
 		{

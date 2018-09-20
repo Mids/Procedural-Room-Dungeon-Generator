@@ -7,20 +7,13 @@ namespace ooparts.dungen
 {
 	public class Room : MonoBehaviour
 	{
-		private Map _map;
-		private GameObject _monstersObject;
-		private Tile[,] _tiles;
-
-		private GameObject _tilesObject;
-		private GameObject _wallsObject;
-		public IntVector2 Coordinates;
-		public Corridor CorridorPrefab;
-		public int MonsterCount;
-
-		public GameObject MonsterPrefab;
-		private GameObject[] Monsters;
 		public int Num;
 
+		public IntVector2 Coordinates;
+		public Corridor CorridorPrefab;
+
+		public int MonsterCount;
+		public GameObject MonsterPrefab;
 		public GameObject PlayerPrefab;
 
 		public Dictionary<Room, Corridor> RoomCorridor = new Dictionary<Room, Corridor>();
@@ -28,6 +21,14 @@ namespace ooparts.dungen
 		public IntVector2 Size;
 		public Tile TilePrefab;
 		public GameObject WallPrefab;
+
+		private Map _map;
+		private GameObject _monstersObject;
+		private Tile[,] _tiles;
+
+		private GameObject _tilesObject;
+		private GameObject _wallsObject;
+		private GameObject[] Monsters;
 
 		public void Init(Map map)
 		{

@@ -18,17 +18,14 @@ namespace ooparts.dungen
 
 	public class Map : TileDungeon2D
 	{
-		private List<Corridor> _corridors;
-
-		private bool _hasPlayer;
-
-		private List<Room> _rooms;
-
-		public float GenerationStepDelay;
 		[HideInInspector] public int RoomCount;
 		public Room RoomPrefab;
 		public RoomSetting[] RoomSettings;
 		[HideInInspector] public MinMax RoomSize;
+
+		private List<Corridor> _corridors;
+		private bool _hasPlayer;
+		private List<Room> _rooms;
 
 		public IntVector2 RandomCoordinates
 		{
