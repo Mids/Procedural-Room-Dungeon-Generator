@@ -11,11 +11,13 @@ namespace ooparts.dungen.Dungeons
 		private IntVector2 _size;
 		private Tile[,] _tiles;
 		private GameObject _tilesObject;
+		private TileDungeon2D _dungeon;
 
-		public void Init(IntVector2 size, IntVector2 coordinates)
+		public void Init(IntVector2 size, IntVector2 coordinates, TileDungeon2D dungeon)
 		{
 			_size = size;
 			_coordinates = coordinates;
+			_dungeon = dungeon;
 		}
 
 		public void Generate()
@@ -34,10 +36,10 @@ namespace ooparts.dungen.Dungeons
 
 		private Tile CreateTile(IntVector2 coordinates)
 		{
-//		if (_map.GetTileType(coordinates) == TileType.Empty)
-//			_map.SetTileType(coordinates, TileType.Room);
-//		else
-//			Debug.LogError("Tile Conflict!");
+			if (_dungeon.GetTileType(coordinates) == TileType.Empty)
+				_dungeon.SetTileType(coordinates, TileType.Room);
+			else
+				Debug.LogError("Tile Conflict!");
 
 			var newTile = Instantiate(TilePrefab);
 			newTile.Coordinates = coordinates;

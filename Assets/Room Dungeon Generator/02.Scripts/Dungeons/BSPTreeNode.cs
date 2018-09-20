@@ -7,7 +7,7 @@
 
 		public BSPTreeNode LNode;
 		public BSPTreeNode RNode;
-		public Room room; // TODO: need to check
+		public BSPRoom Room; // TODO: need to check
 
 		public BSPTreeNode(IntVector2 size, IntVector2 coordinates)
 		{

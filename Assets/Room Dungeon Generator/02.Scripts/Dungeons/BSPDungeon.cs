@@ -6,14 +6,16 @@ namespace ooparts.dungen.Dungeons
 {
 	public class BSPDungeon : TileDungeon2D
 	{
-		private IntVector2 _minPartitionSize;
-		private BSPTreeNode _rootNode;
 		public IntVector2 MinRoomSize;
 		public int Padding = 1;
 		public BSPRoom RoomPrefab;
+		public BSPCorridor CorridorPrefab;
+		private IntVector2 _minPartitionSize;
+		private BSPTreeNode _rootNode;
 
-		private void Start()
+		protected override void Start()
 		{
+			base.Start();
 			// Partition Size is 1 tile larger than room size for padding
 			_rootNode = GenerateNode(MapSize + 2 * Padding, IntVector2.Zero - Padding);
 			_minPartitionSize = MinRoomSize + 2 * Padding;
@@ -21,16 +23,21 @@ namespace ooparts.dungen.Dungeons
 		}
 
 		// Generate Room for the Partition
-		public void GenerateRoom(IntVector2 size, IntVector2 coordinates)
+		public BSPRoom GenerateRoom(IntVector2 size, IntVector2 coordinates)
 		{
 			var room = Instantiate(RoomPrefab);
-			room.Init(size, coordinates);
+			room.Init(size, coordinates, this);
 			room.Generate();
+			return room;
 		}
 
 		// Generate Corridor between two coordinates
-		public void GenerateCorridor(IntVector2 left, IntVector2 right)
+		public BSPCorridor GenerateCorridor(IntVector2 a, IntVector2 b, IntVector2 coordinates)
 		{
+			var corridor = Instantiate(CorridorPrefab);
+			corridor.Init(a, b, coordinates, this);
+			corridor.GenerateStraight();
+			return corridor;
 		}
 
 		// March until connected to room or corridor
@@ -46,6 +53,8 @@ namespace ooparts.dungen.Dungeons
 				// 
 				var LCenter = node.LNode.Coordinates + node.LNode.PartitionSize / 2;
 				var RCenter = node.RNode.Coordinates + node.RNode.PartitionSize / 2;
+
+				GenerateCorridor(LCenter, RCenter, node.Coordinates);
 			}
 
 			yield return null;
@@ -70,7 +79,7 @@ namespace ooparts.dungen.Dungeons
 					Random.Range(minRoomCoordinates.z, maxRoomCoordinates.z)
 				);
 
-				GenerateRoom(roomSize, roomCoordinates);
+				node.Room = GenerateRoom(roomSize, roomCoordinates);
 
 				// For Debug
 				var leftBot = node.Coordinates.GetVector3();
@@ -108,6 +117,7 @@ namespace ooparts.dungen.Dungeons
 				// Split child nodes
 				yield return SplitPartition(node.LNode);
 				yield return SplitPartition(node.RNode);
+				yield return ConnectRooms(node);
 			}
 			else
 			{
@@ -132,6 +142,7 @@ namespace ooparts.dungen.Dungeons
 				// Split child nodes
 				yield return SplitPartition(node.LNode);
 				yield return SplitPartition(node.RNode);
+				yield return ConnectRooms(node);
 			}
 		}
 

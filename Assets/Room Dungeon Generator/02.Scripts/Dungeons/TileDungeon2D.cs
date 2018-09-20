@@ -12,12 +12,13 @@ namespace ooparts.dungen.Dungeons
 
 	public abstract class TileDungeon2D : MonoBehaviour
 	{
+		public int TileSize = 1;
 		public IntVector2 MapSize;
 
 		private TileType[,] _tileTypes;
 
 		// Use this for initialization
-		private void Start()
+		protected virtual void Start()
 		{
 			_tileTypes = new TileType[MapSize.x, MapSize.z];
 		}
