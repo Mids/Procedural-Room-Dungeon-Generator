@@ -3,7 +3,7 @@ It procedurally generates room dungeons. You can use this by simply adding an em
 
 Any kinds of contributing will always be welcomed
 
-It's available at : https://www.assetstore.unity3d.com/#!/content/67195
+It's available at : https://assetstore.unity.com/packages/tools/procedural-room-dungeon-generator-67195
 
 ---
 #### TO-DO List
